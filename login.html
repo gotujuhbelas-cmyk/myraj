@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - CV REZEKI AMANAH JAYA Group</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #051f10 0%, #0a2f18 50%, #0d4a25 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #fff;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Animated Background */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                radial-gradient(circle at 20% 50%, rgba(74, 222, 128, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(34, 197, 94, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 40% 20%, rgba(22, 163, 74, 0.1) 0%, transparent 50%);
+            z-index: 0;
+            animation: pulse 8s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 0.5; transform: scale(1); }
+            50% { opacity: 1; transform: scale(1.05); }
+        }
+
+        /* Floating Particles */
+        .particle {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(74, 222, 128, 0.3);
+            animation: float 20s infinite;
+            z-index: 0;
+        }
+
+        .particle:nth-child(1) { width: 60px; height: 60px; left: 10%; top: 20%; animation-delay: 0s; }
+        .particle:nth-child(2) { width: 40px; height: 40px; right: 15%; top: 60%; animation-delay: 5s; }
+        .particle:nth-child(3) { width: 80px; height: 80px; left: 50%; bottom: 10%; animation-delay: 10s; }
+        .particle:nth-child(4) { width: 50px; height: 50px; right: 30%; top: 30%; animation-delay: 15s; }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0) rotate(0deg); opacity: 0.3; }
+            50% { transform: translateY(-100px) rotate(180deg); opacity: 0.6; }
+        }
+
+        .login-container {
+            position: relative;
+            z-index: 1;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(74, 222, 128, 0.2);
+            border-radius: 24px;
+            padding: 50px 40px;
+            max-width: 450px;
+            width: 90%;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3);
+            animation: slideUp 0.8s ease;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .logo-section {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .logo-wrapper {
+            position: relative;
+            display: inline-block;
+            margin-bottom: 25px;
+        }
+
+        .logo-wrapper::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 150px;
+            height: 150px;
+            background: radial-gradient(circle, rgba(74, 222, 128, 0.4) 0%, transparent 70%);
+            border-radius: 50%;
+            animation: glow 3s ease-in-out infinite;
+            z-index: -1;
+        }
+
+        @keyframes glow {
+            0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.5; }
+            50% { transform: translate(-50%, -50%) scale(1.2); opacity: 0.8; }
+        }
+
+        .logo-wrapper img {
+            width: 120px;
+            height: auto;
+            filter: drop-shadow(0 10px 30px rgba(74, 222, 128, 0.3));
+            animation: float 6s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .company-name {
+            font-size: 24px;
+            font-weight: 800;
+            background: linear-gradient(135deg, #4ade80, #22c55e, #16a34a);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 8px;
+            letter-spacing: 1px;
+        }
+
+        .tagline {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.6);
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-group label {
+            display: block;
+            color: rgba(255, 255, 255, 0.8);
+            margin-bottom: 10px;
+            font-size: 13px;
+            font-weight: 500;
+            letter-spacing: 0.5px;
+        }
+
+        .input-wrapper {
+            position: relative;
+        }
+
+        .input-wrapper i {
+            position: absolute;
+            left: 18px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: rgba(74, 222, 128, 0.6);
+            font-size: 16px;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 15px 18px 15px 50px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(74, 222, 128, 0.2);
+            border-radius: 12px;
+            color: #fff;
+            font-size: 14px;
+            font-family: inherit;
+            transition: all 0.3s;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #4ade80;
+            background: rgba(74, 222, 128, 0.05);
+            box-shadow: 0 0 0 4px rgba(74, 222, 128, 0.1);
+        }
+
+        .form-group input::placeholder {
+            color: rgba(255, 255, 255, 0.3);
+        }
+
+        .btn-login {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, #4ade80, #22c55e);
+            border: none;
+            border-radius: 12px;
+            color: white;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            letter-spacing: 0.5px;
+            box-shadow: 0 10px 30px rgba(74, 222, 128, 0.3);
+        }
+
+        .btn-login:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 15px 40px rgba(74, 222, 128, 0.4);
+        }
+
+        .btn-login:active {
+            transform: translateY(0);
+        }
+
+        .btn-login:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .alert {
+            padding: 15px 20px;
+            border-radius: 12px;
+            margin-bottom: 25px;
+            display: none;
+            align-items: center;
+            gap: 12px;
+            animation: slideDown 0.3s ease;
+            font-size: 13px;
+        }
+
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .alert.show {
+            display: flex;
+        }
+
+        .alert-error {
+            background: rgba(239, 68, 68, 0.15);
+            color: #ef4444;
+            border: 1px solid rgba(239, 68, 68, 0.3);
+        }
+
+        .alert-success {
+            background: rgba(74, 222, 128, 0.15);
+            color: #4ade80;
+            border: 1px solid rgba(74, 222, 128, 0.3);
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            color: rgba(255, 255, 255, 0.4);
+            font-size: 12px;
+        }
+
+        .footer i {
+            color: #4ade80;
+        }
+
+        @media (max-width: 480px) {
+            .login-container {
+                padding: 40px 30px;
+            }
+            .company-name {
+                font-size: 20px;
+            }
+            .logo-wrapper img {
+                width: 100px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Floating Particles -->
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+
+    <div class="login-container">
+        <div class="logo-section">
+            <div class="logo-wrapper">
+                <img src="logo-raj.png" alt="CV REZEKI AMANAH JAYA" onerror="this.style.display='none'">
+            </div>
+            <h1 class="company-name">MyRAJ</h1>
+            <p class="tagline">Money & Yield Rezeki Amanah Jaya</p>
+        </div>
+
+        <div id="alertContainer"></div>
+
+        <form id="loginForm" onsubmit="handleLogin(event)">
+            <div class="form-group">
+                <label><i class="fa-solid fa-envelope"></i> Email</label>
+                <div class="input-wrapper">
+                    <i class="fa-solid fa-user"></i>
+                    <input type="email" id="email" placeholder="admin@raj.com" required autocomplete="email">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label><i class="fa-solid fa-lock"></i> Password</label>
+                <div class="input-wrapper">
+                    <i class="fa-solid fa-key"></i>
+                    <input type="password" id="password" placeholder="••••••••" required autocomplete="current-password">
+                </div>
+            </div>
+
+            <button type="submit" class="btn-login" id="btnLogin">
+                <i class="fa-solid fa-right-to-bracket"></i>
+                <span>Masuk ke Dashboard</span>
+            </button>
+        </form>
+
+        <div class="footer">
+            <p>&copy; 2026 CV REZEKI AMANAH JAYA Group</p>
+            <p style="margin-top: 5px; font-size: 11px;">
+                <i class="fa-solid fa-leaf"></i> Supplier & Waste Solution Partner
+            </p>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
+        import { getAuth, signInWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyCd70zeLsmPYBHH1UdKkp4dlrKr57P73yk",
+            authDomain: "ecotrack-184c2.firebaseapp.com",
+            projectId: "ecotrack-184c2",
+            storageBucket: "ecotrack-184c2.firebasestorage.app",
+            messagingSenderId: "703447241523",
+            appId: "1:703447241523:web:0841c9817537b0aa82a446"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+
+        // Auto redirect if already logged in
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                window.location.href = 'manajemen.html';
+            }
+        });
+
+        window.handleLogin = async function(e) {
+            e.preventDefault();
+            
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const btnLogin = document.getElementById('btnLogin');
+            
+            btnLogin.disabled = true;
+            btnLogin.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i><span>Memproses...</span>';
+            
+            try {
+                await signInWithEmailAndPassword(auth, email, password);
+                // onAuthStateChanged will auto redirect to manajemen.html
+            } catch (error) {
+                let message = 'Login gagal. Periksa email dan password Anda.';
+                
+                if (error.code === 'auth/user-not-found') {
+                    message = 'Email tidak terdaftar di sistem.';
+                } else if (error.code === 'auth/wrong-password') {
+                    message = 'Password yang Anda masukkan salah.';
+                } else if (error.code === 'auth/invalid-email') {
+                    message = 'Format email tidak valid.';
+                } else if (error.code === 'auth/too-many-requests') {
+                    message = 'Terlalu banyak percobaan. Silakan coba lagi nanti.';
+                }
+                
+                showAlert(message, 'error');
+                btnLogin.disabled = false;
+                btnLogin.innerHTML = '<i class="fa-solid fa-right-to-bracket"></i><span>Masuk ke Dashboard</span>';
+            }
+        };
+
+        function showAlert(message, type) {
+            const container = document.getElementById('alertContainer');
+            const alert = document.createElement('div');
+            alert.className = `alert alert-${type} show`;
+            
+            const icon = type === 'success' ? 'check-circle' : 'exclamation-circle';
+            alert.innerHTML = `<i class="fa-solid fa-${icon}"></i><span>${message}</span>`;
+            
+            container.innerHTML = '';
+            container.appendChild(alert);
+            
+            setTimeout(() => alert.remove(), 5000);
+        }
+    </script>
+</body>
+</html>
