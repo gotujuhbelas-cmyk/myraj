@@ -3,131 +3,215 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MyRAJ Admin - Dashboard</title>
+    <title>MyRAJ - Money & Yield Rezeki Amanah Jaya</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: 'Inter', sans-serif; background: linear-gradient(135deg, #021a0d 0%, #052e16 50%, #064e24 100%); min-height: 100vh; color: #fff; }
-        .navbar { background: rgba(255,255,255,0.05); backdrop-filter: blur(20px); padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(74,222,128,0.2); position: sticky; top: 0; z-index: 100; }
-        .navbar-brand { display: flex; align-items: center; gap: 15px; }
-        .navbar-brand img { height: 40px; }
-        .navbar-brand h2 { font-size: 22px; background: linear-gradient(135deg, #4ade80, #22c55e); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        .navbar-brand span { font-size: 11px; color: rgba(255,255,255,0.6); display: block; }
-        .nav-links { display: flex; gap: 10px; align-items: center; }
-        .nav-links a, .nav-links span { color: white; text-decoration: none; padding: 8px 15px; border-radius: 8px; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.1); font-size: 13px; display: inline-flex; align-items: center; gap: 8px; }
-        .nav-links .logout-btn { background: rgba(239,68,68,0.1); border-color: rgba(239,68,68,0.3); color: #ef4444; cursor: pointer; }
-        .nav-links .logout-btn:hover { background: rgba(239,68,68,0.2); }
-        .container { max-width: 1500px; margin: 30px auto; padding: 0 20px; }
-        .tabs { display: flex; gap: 8px; margin-bottom: 25px; flex-wrap: wrap; }
-        .tab-btn { padding: 10px 20px; border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.05); color: rgba(255,255,255,0.7); border-radius: 10px; cursor: pointer; font-size: 13px; font-weight: 500; transition: all 0.3s; display: flex; align-items: center; gap: 8px; }
+        .navbar { background: rgba(255,255,255,0.05); backdrop-filter: blur(20px); padding: 20px 40px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(74,222,128,0.2); position: sticky; top: 0; z-index: 100; }
+        .navbar-brand { display: flex; align-items: center; gap: 20px; }
+        .navbar-brand img { height: 45px; filter: drop-shadow(0 4px 8px rgba(0,0,0,0.3)); }
+        .navbar-brand h2 { font-size: 24px; background: linear-gradient(135deg, #4ade80, #22c55e); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .navbar-brand span { font-size: 12px; color: rgba(255,255,255,0.6); display: block; }
+        .nav-links { display: flex; gap: 10px; }
+        .nav-links a { color: white; text-decoration: none; padding: 10px 18px; border-radius: 10px; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.1); transition: all 0.3s; font-size: 14px; font-weight: 500; }
+        .nav-links a:hover { background: rgba(74,222,128,0.2); border-color: #4ade80; }
+        .container { max-width: 1600px; margin: 40px auto; padding: 0 40px; }
+        .tabs { display: flex; gap: 10px; margin-bottom: 30px; flex-wrap: wrap; }
+        .tab-btn { padding: 12px 24px; border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.05); color: rgba(255,255,255,0.7); border-radius: 12px; cursor: pointer; font-size: 14px; font-weight: 500; transition: all 0.3s; display: flex; align-items: center; gap: 8px; }
         .tab-btn:hover { background: rgba(255,255,255,0.1); color: #fff; }
-        .tab-btn.active { background: linear-gradient(135deg, #4ade80, #22c55e); color: white; border-color: transparent; }
-        .tab-content { display: none; animation: fadeIn 0.4s ease; }
+        .tab-btn.active { background: linear-gradient(135deg, #4ade80, #22c55e); color: white; border-color: transparent; box-shadow: 0 4px 15px rgba(74,222,128,0.3); }
+        .tab-content { display: none; animation: fadeIn 0.5s ease; }
         .tab-content.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 25px; }
-        .stat-card { background: rgba(255,255,255,0.08); padding: 20px; border-radius: 15px; border: 1px solid rgba(255,255,255,0.1); position: relative; overflow: hidden; }
-        .stat-card::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 3px; background: linear-gradient(90deg, #4ade80, #22c55e); }
-        .stat-card h3 { color: rgba(255,255,255,0.7); font-size: 11px; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 1px; }
-        .stat-card .value { font-size: 24px; font-weight: 700; }
-        .stat-card i { position: absolute; right: 15px; top: 50%; transform: translateY(-50%); font-size: 40px; opacity: 0.1; }
-        .section { background: rgba(255,255,255,0.08); padding: 25px; border-radius: 15px; border: 1px solid rgba(255,255,255,0.1); margin-bottom: 20px; }
-        .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding-bottom: 12px; border-bottom: 1px solid rgba(74,222,128,0.3); flex-wrap: wrap; gap: 10px; }
-        .section-header h3 { color: #fff; font-size: 18px; display: flex; align-items: center; gap: 10px; }
-        .btn { padding: 8px 16px; border: none; border-radius: 8px; cursor: pointer; font-size: 13px; font-weight: 600; transition: all 0.3s; display: inline-flex; align-items: center; gap: 6px; text-decoration: none; }
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; margin-bottom: 30px; }
+        .stat-card { background: rgba(255,255,255,0.08); backdrop-filter: blur(20px); padding: 25px; border-radius: 18px; border: 1px solid rgba(255,255,255,0.1); position: relative; overflow: hidden; transition: all 0.3s; }
+        .stat-card:hover { transform: translateY(-5px); border-color: rgba(74,222,128,0.3); }
+        .stat-card::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 4px; background: linear-gradient(90deg, #4ade80, #22c55e); }
+        .stat-card.profit::before { background: linear-gradient(90deg, #10b981, #059669); }
+        .stat-card.expense::before { background: linear-gradient(90deg, #ef4444, #dc2626); }
+        .stat-card.warning::before { background: linear-gradient(90deg, #f59e0b, #d97706); }
+        .stat-card.info::before { background: linear-gradient(90deg, #06b6d4, #0891b2); }
+        .stat-card h3 { color: rgba(255,255,255,0.7); font-size: 13px; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 1px; }
+        .stat-card .value { font-size: 28px; font-weight: 700; }
+        .stat-card i { position: absolute; right: 20px; top: 50%; transform: translateY(-50%); font-size: 50px; opacity: 0.1; }
+        .section { background: rgba(255,255,255,0.08); backdrop-filter: blur(20px); padding: 30px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.1); margin-bottom: 25px; }
+        .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; padding-bottom: 15px; border-bottom: 2px solid rgba(74,222,128,0.3); flex-wrap: wrap; gap: 15px; }
+        .section-header h3 { color: #fff; font-size: 20px; display: flex; align-items: center; gap: 10px; }
+        .section-header h3 i { color: #4ade80; }
+        .btn { padding: 10px 20px; border: none; border-radius: 10px; cursor: pointer; font-size: 14px; font-weight: 600; transition: all 0.3s; display: inline-flex; align-items: center; gap: 8px; text-decoration: none; }
         .btn-primary { background: linear-gradient(135deg, #4ade80, #22c55e); color: white; }
-        .btn-success { background: #10b981; color: white; }
-        .btn-warning { background: #f59e0b; color: white; }
-        .btn-danger { background: #ef4444; color: white; }
-        .btn-info { background: #3b82f6; color: white; }
-        .btn-cyan { background: #06b6d4; color: white; }
-        .btn-sm { padding: 5px 10px; font-size: 11px; }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(74,222,128,0.4); }
+        .btn-success { background: linear-gradient(135deg, #10b981, #059669); color: white; }
+        .btn-success:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(16,185,129,0.4); }
+        .btn-warning { background: linear-gradient(135deg, #f59e0b, #d97706); color: white; }
+        .btn-warning:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(245,158,11,0.4); }
+        .btn-danger { background: linear-gradient(135deg, #ef4444, #dc2626); color: white; }
+        .btn-info { background: linear-gradient(135deg, #3b82f6, #1d4ed8); color: white; }
+        .btn-cyan { background: linear-gradient(135deg, #06b6d4, #0891b2); color: white; }
+        .btn-cyan:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(6,182,212,0.4); }
+        .btn-sm { padding: 6px 12px; font-size: 12px; }
+        .btn-xs { padding: 4px 8px; font-size: 11px; }
         .table-container { overflow-x: auto; border-radius: 12px; }
         table { width: 100%; border-collapse: collapse; }
-        th, td { padding: 12px 10px; text-align: left; border-bottom: 1px solid rgba(255,255,255,0.08); font-size: 13px; }
-        th { background: rgba(255,255,255,0.05); color: rgba(255,255,255,0.8); font-size: 11px; text-transform: uppercase; }
-        .badge { padding: 4px 10px; border-radius: 15px; font-size: 10px; font-weight: 600; }
-        .badge-paid { background: rgba(74,222,128,0.2); color: #4ade80; }
-        .badge-pending { background: rgba(251,191,36,0.2); color: #fbbf24; }
-        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 1000; justify-content: center; align-items: center; }
+        th, td { padding: 14px 12px; text-align: left; border-bottom: 1px solid rgba(255,255,255,0.08); }
+        th { background: rgba(255,255,255,0.05); font-weight: 600; color: rgba(255,255,255,0.8); font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; }
+        td { color: rgba(255,255,255,0.9); font-size: 14px; }
+        tr:hover { background: rgba(74,222,128,0.05); }
+        .badge { padding: 6px 12px; border-radius: 20px; font-size: 11px; font-weight: 600; display: inline-block; }
+        .badge-pending { background: rgba(251,191,36,0.2); color: #fbbf24; border: 1px solid rgba(251,191,36,0.3); }
+        .badge-paid { background: rgba(74,222,128,0.2); color: #4ade80; border: 1px solid rgba(74,222,128,0.3); }
+        .badge-category { background: rgba(59,130,246,0.2); color: #60a5fa; border: 1px solid rgba(59,130,246,0.3); }
+        .badge-asset { background: rgba(168,85,247,0.2); color: #a855f7; border: 1px solid rgba(168,85,247,0.3); }
+        .badge-low { background: rgba(245,158,11,0.2); color: #f59e0b; border: 1px solid rgba(245,158,11,0.3); }
+        .badge-progress { background: rgba(6,182,212,0.2); color: #06b6d4; border: 1px solid rgba(6,182,212,0.3); }
+        .badge-completed { background: rgba(16,185,129,0.2); color: #10b981; border: 1px solid rgba(16,185,129,0.3); }
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); backdrop-filter: blur(5px); z-index: 1000; justify-content: center; align-items: center; }
         .modal-overlay.active { display: flex; }
-        .modal { background: #0f291e; border: 1px solid rgba(74,222,128,0.2); border-radius: 15px; padding: 25px; max-width: 600px; width: 90%; max-height: 90vh; overflow-y: auto; }
-        .modal-header { display: flex; justify-content: space-between; margin-bottom: 20px; padding-bottom: 10px; border-bottom: 1px solid rgba(255,255,255,0.1); }
-        .modal-close { background: none; border: none; color: #fff; font-size: 20px; cursor: pointer; }
-        .form-group { margin-bottom: 15px; }
-        .form-group label { display: block; color: rgba(255,255,255,0.8); margin-bottom: 6px; font-size: 12px; }
-        .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 10px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.15); border-radius: 8px; color: #fff; font-size: 13px; }
-        .form-group select option { background: #0f291e; color: #fff; }
+        .modal { background: linear-gradient(135deg, #021a0d, #064e24); border: 1px solid rgba(74,222,128,0.2); border-radius: 20px; padding: 30px; max-width: 700px; width: 90%; max-height: 85vh; overflow-y: auto; animation: slideUp 0.3s ease; }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        .modal-header h3 { color: #fff; font-size: 20px; }
+        .modal-close { background: none; border: none; color: rgba(255,255,255,0.6); font-size: 24px; cursor: pointer; }
+        .modal-close:hover { color: #fff; }
+        .form-group { margin-bottom: 18px; }
+        .form-group label { display: block; color: rgba(255,255,255,0.8); margin-bottom: 8px; font-size: 13px; font-weight: 500; }
+        .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 12px 15px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.15); border-radius: 10px; color: #fff; font-size: 14px; font-family: inherit; }
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus { outline: none; border-color: #4ade80; background: rgba(255,255,255,0.08); }
+        .form-group select option { background: #021a0d; color: #fff; }
         .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
-        .alert { padding: 12px 15px; border-radius: 8px; margin-bottom: 15px; display: flex; align-items: center; gap: 10px; font-size: 13px; }
+        .input-group { display: flex; gap: 10px; }
+        .input-group select { flex: 1; }
+        .alert { padding: 15px 20px; border-radius: 12px; margin-bottom: 20px; display: flex; align-items: center; gap: 12px; animation: slideDown 0.3s ease; }
+        @keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
         .alert-success { background: rgba(74,222,128,0.15); color: #4ade80; border: 1px solid rgba(74,222,128,0.3); }
         .alert-error { background: rgba(239,68,68,0.15); color: #ef4444; border: 1px solid rgba(239,68,68,0.3); }
-        .loading { text-align: center; padding: 40px; color: rgba(255,255,255,0.6); }
+        .alert-info { background: rgba(59,130,246,0.15); color: #60a5fa; border: 1px solid rgba(59,130,246,0.3); }
+        .loading { text-align: center; padding: 50px; color: rgba(255,255,255,0.7); }
+        .loading i { font-size: 40px; animation: spin 1s linear infinite; color: #4ade80; }
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+        .report-summary { display: flex; justify-content: space-between; align-items: center; padding: 20px; background: rgba(74,222,128,0.1); border-radius: 12px; margin-top: 20px; border: 1px solid rgba(74,222,128,0.3); }
+        .report-summary.loss { background: rgba(239,68,68,0.1); border-color: rgba(239,68,68,0.3); }
+        .report-summary h4 { font-size: 18px; margin-bottom: 5px; }
+        .report-summary .total { font-size: 32px; font-weight: 800; }
+        .report-section-title { font-size: 16px; font-weight: 700; color: #4ade80; margin: 20px 0 10px 0; text-transform: uppercase; letter-spacing: 1px; border-bottom: 1px solid rgba(74,222,128,0.3); padding-bottom: 5px; }
+        .report-section-title.expense-title { color: #ef4444; border-color: rgba(239,68,68,0.3); }
+        .report-section-title.asset-title { color: #3b82f6; border-color: rgba(59,130,246,0.3); }
+        .report-section-title.liability-title { color: #f59e0b; border-color: rgba(245,158,11,0.3); }
+        .report-section-title.equity-title { color: #a855f7; border-color: rgba(168,85,247,0.3); }
+        .report-section-title.cashflow-title { color: #06b6d4; border-color: rgba(6,182,212,0.3); }
+        .asset-card, .product-card, .production-card { background: rgba(255,255,255,0.05); padding: 20px; border-radius: 15px; border: 1px solid rgba(255,255,255,0.1); margin-bottom: 15px; transition: all 0.3s; }
+        .product-card:hover, .production-card:hover { border-color: rgba(74,222,128,0.3); }
+        .product-card.low-stock { border-color: rgba(245,158,11,0.5); background: rgba(245,158,11,0.05); }
+        .production-card.in-progress { border-color: rgba(6,182,212,0.5); background: rgba(6,182,212,0.05); }
+        .production-card.completed { border-color: rgba(16,185,129,0.5); background: rgba(16,185,129,0.05); }
+        .product-header, .production-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 15px; }
+        .product-header h4, .production-header h4 { color: #4ade80; margin-bottom: 5px; }
+        .product-header .code, .production-header .code { font-size: 12px; color: rgba(255,255,255,0.5); }
+        .product-stats, .production-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 10px; }
+        .product-stat, .production-stat { padding: 10px; background: rgba(255,255,255,0.03); border-radius: 8px; }
+        .product-stat strong, .production-stat strong { color: #4ade80; display: block; font-size: 11px; text-transform: uppercase; margin-bottom: 3px; }
+        .product-stat .val, .production-stat .val { font-size: 16px; font-weight: 700; }
+        .product-actions, .production-actions { display: flex; gap: 8px; margin-top: 15px; flex-wrap: wrap; }
+        .asset-info { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; font-size: 13px; }
+        .asset-info div { padding: 8px; background: rgba(255,255,255,0.03); border-radius: 8px; }
+        .asset-info strong { color: #4ade80; display: block; margin-bottom: 3px; }
+        .report-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; }
+        .dynamic-list { margin-top: 15px; }
+        .dynamic-item { background: rgba(255,255,255,0.03); padding: 12px; border-radius: 10px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+        .dynamic-item-info { flex: 1; }
+        .dynamic-item-info strong { color: #4ade80; display: block; }
+        .dynamic-item-info small { color: rgba(255,255,255,0.6); }
+        .add-item-btn { background: rgba(74,222,128,0.1); border: 1px dashed rgba(74,222,128,0.3); color: #4ade80; padding: 10px; border-radius: 10px; cursor: pointer; width: 100%; margin-top: 10px; transition: all 0.3s; }
+        .add-item-btn:hover { background: rgba(74,222,128,0.2); }
+        .cashflow-section { background: rgba(255,255,255,0.03); padding: 20px; border-radius: 12px; margin-bottom: 20px; border-left: 4px solid #06b6d4; }
+        .cashflow-section h4 { color: #06b6d4; margin-bottom: 15px; font-size: 14px; text-transform: uppercase; letter-spacing: 1px; }
+        .cashflow-item { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
+        .cashflow-item:last-child { border-bottom: none; }
+        .cashflow-item.total { font-weight: 700; font-size: 16px; border-top: 2px solid rgba(6,182,212,0.3); border-bottom: none; margin-top: 10px; padding-top: 15px; }
+        .cashflow-item.negative { color: #ef4444; }
+        .cashflow-item.positive { color: #10b981; }
         .charts-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 20px; margin-bottom: 20px; }
-        .charts-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px; }
-        .chart-card { background: rgba(255,255,255,0.05); padding: 20px; border-radius: 15px; border: 1px solid rgba(255,255,255,0.1); }
-        .chart-card h4 { color: #fff; margin-bottom: 15px; font-size: 14px; }
-        .chart-container { position: relative; height: 250px; }
-        @media (max-width: 768px) { .charts-grid, .charts-grid-2, .form-row { grid-template-columns: 1fr; } }
+        .charts-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .chart-card { background: rgba(255,255,255,0.05); padding: 25px; border-radius: 15px; border: 1px solid rgba(255,255,255,0.1); }
+        .chart-card h4 { color: #fff; margin-bottom: 20px; font-size: 16px; display: flex; align-items: center; gap: 10px; }
+        .chart-card h4 i { color: #4ade80; }
+        .chart-container { position: relative; height: 300px; }
+        .chart-container-small { position: relative; height: 250px; }
+        @media (max-width: 768px) { .navbar { padding: 15px 20px; flex-direction: column; gap: 15px; } .container { padding: 0 20px; } .stats-grid { grid-template-columns: 1fr; } .form-row { grid-template-columns: 1fr; } .report-grid { grid-template-columns: 1fr; } .charts-grid { grid-template-columns: 1fr; } .charts-grid-2 { grid-template-columns: 1fr; } }
     </style>
 </head>
 <body>
     <div class="navbar">
         <div class="navbar-brand">
             <img src="logo-raj.png" alt="MyRAJ" onerror="this.style.display='none'">
-            <div><h2>MyRAJ</h2><span>Money & Yield Rezeki Amanah Jaya</span></div>
+            <div>
+                <h2>MyRAJ</h2>
+                <span>Money & Yield Rezeki Amanah Jaya</span>
+            </div>
         </div>
-        <div class="nav-links">
-            <span><i class="fa-solid fa-user-circle"></i> <span id="currentUserName">Loading...</span></span>
-            <a href="#" class="logout-btn" id="btnLogout"><i class="fa-solid fa-right-from-bracket"></i> Logout</a>
-            <a href="index.html"><i class="fa-solid fa-home"></i> Portal</a>
-        </div>
+        <div class="nav-links"><a href="index.html"><i class="fa-solid fa-home"></i> Portal</a></div>
     </div>
 
     <div class="container">
         <div id="alertContainer"></div>
+
         <div class="tabs">
-            <button class="tab-btn active" data-tab="dashboard" onclick="switchTab('dashboard')"><i class="fa-solid fa-chart-pie"></i> Dashboard</button>
-            <button class="tab-btn" data-tab="ritase" onclick="switchTab('ritase')"><i class="fa-solid fa-truck"></i> Ritase</button>
-            <button class="tab-btn" data-tab="clients" onclick="switchTab('clients')"><i class="fa-solid fa-users"></i> Client</button>
-            <button class="tab-btn" data-tab="invoices" onclick="switchTab('invoices')"><i class="fa-solid fa-file-invoice"></i> Invoice</button>
-            <button class="tab-btn" data-tab="expenses" onclick="switchTab('expenses')"><i class="fa-solid fa-money-bill"></i> Pengeluaran</button>
-            <button class="tab-btn" data-tab="assets" onclick="switchTab('assets')"><i class="fa-solid fa-truck-moving"></i> Aset</button>
-            <button class="tab-btn" data-tab="inventory" onclick="switchTab('inventory')"><i class="fa-solid fa-boxes-stacked"></i> Stok</button>
-            <button class="tab-btn" data-tab="production" onclick="switchTab('production')"><i class="fa-solid fa-flask"></i> Produksi</button>
-            <button class="tab-btn" data-tab="reports" onclick="switchTab('reports')"><i class="fa-solid fa-file-lines"></i> Laporan</button>
+            <button class="tab-btn active" onclick="switchTab('dashboard')"><i class="fa-solid fa-chart-pie"></i> Dashboard</button>
+            <button class="tab-btn" onclick="switchTab('ritase')"><i class="fa-solid fa-truck-moving"></i> Data Ritase</button>
+            <button class="tab-btn" onclick="switchTab('clients')"><i class="fa-solid fa-users"></i> Client</button>
+            <button class="tab-btn" onclick="switchTab('invoices')"><i class="fa-solid fa-file-invoice-dollar"></i> Invoice</button>
+            <button class="tab-btn" onclick="switchTab('expenses')"><i class="fa-solid fa-money-bill-wave"></i> Pengeluaran</button>
+            <button class="tab-btn" onclick="switchTab('assets')"><i class="fa-solid fa-truck"></i> Aset Tetap</button>
+            <button class="tab-btn" onclick="switchTab('inventory')"><i class="fa-solid fa-boxes-stacked"></i> Persediaan</button>
+            <button class="tab-btn" onclick="switchTab('production')"><i class="fa-solid fa-flask"></i> Produksi Biopond</button>
+            <button class="tab-btn" onclick="switchTab('reports')"><i class="fa-solid fa-file-lines"></i> Laporan</button>
         </div>
 
         <!-- DASHBOARD -->
         <div id="tab-dashboard" class="tab-content active">
             <div class="stats-grid">
-                <div class="stat-card"><i class="fa-solid fa-recycle"></i><h3>Ritase</h3><div class="value" id="statRitase">-</div></div>
-                <div class="stat-card"><i class="fa-solid fa-weight-hanging"></i><h3>Sampah</h3><div class="value" id="statBerat">-</div></div>
-                <div class="stat-card"><i class="fa-solid fa-users"></i><h3>Client</h3><div class="value" id="statClient">-</div></div>
-                <div class="stat-card"><i class="fa-solid fa-coins"></i><h3>Pendapatan</h3><div class="value" id="statPendapatan">-</div></div>
-                <div class="stat-card"><i class="fa-solid fa-arrow-trend-down"></i><h3>Pengeluaran</h3><div class="value" id="statPengeluaran">-</div></div>
-                <div class="stat-card"><i class="fa-solid fa-chart-line"></i><h3>Laba Bersih</h3><div class="value" id="statLaba">-</div></div>
+                <div class="stat-card"><i class="fa-solid fa-recycle"></i><h3>Total Ritase</h3><div class="value" id="statRitase">-</div></div>
+                <div class="stat-card"><i class="fa-solid fa-weight-hanging"></i><h3>Total Sampah</h3><div class="value" id="statBerat">-</div></div>
+                <div class="stat-card"><i class="fa-solid fa-leaf"></i><h3>Sudah Diolah</h3><div class="value" id="statDiolah">-</div></div>
+                <div class="stat-card"><i class="fa-solid fa-users"></i><h3>Client Aktif</h3><div class="value" id="statClient">-</div></div>
+                <div class="stat-card"><i class="fa-solid fa-file-invoice"></i><h3>Invoice Pending</h3><div class="value" id="statPending">-</div></div>
+                <div class="stat-card"><i class="fa-solid fa-coins"></i><h3>Total Pendapatan</h3><div class="value" id="statPendapatan">-</div></div>
+                <div class="stat-card expense"><i class="fa-solid fa-arrow-trend-down"></i><h3>Total Pengeluaran</h3><div class="value" id="statPengeluaran">-</div></div>
+                <div class="stat-card profit"><i class="fa-solid fa-chart-line"></i><h3>Laba Bersih</h3><div class="value" id="statLaba">-</div></div>
             </div>
+
             <div class="charts-grid">
-                <div class="chart-card"><h4>Tren Pendapatan vs Pengeluaran</h4><div class="chart-container"><canvas id="chartRevenueExpense"></canvas></div></div>
-                <div class="chart-card"><h4>Status Invoice</h4><div class="chart-container"><canvas id="chartInvoiceStatus"></canvas></div></div>
+                <div class="chart-card">
+                    <h4><i class="fa-solid fa-chart-line"></i> Tren Pendapatan vs Pengeluaran</h4>
+                    <div class="chart-container"><canvas id="chartRevenueExpense"></canvas></div>
+                </div>
+                <div class="chart-card">
+                    <h4><i class="fa-solid fa-chart-pie"></i> Status Invoice</h4>
+                    <div class="chart-container-small"><canvas id="chartInvoiceStatus"></canvas></div>
+                </div>
             </div>
+
             <div class="charts-grid-2">
-                <div class="chart-card"><h4>Top 5 Client</h4><div class="chart-container"><canvas id="chartTopClients"></canvas></div></div>
-                <div class="chart-card"><h4>Komposisi Beban</h4><div class="chart-container"><canvas id="chartExpenses"></canvas></div></div>
+                <div class="chart-card">
+                    <h4><i class="fa-solid fa-chart-bar"></i> Top 5 Client</h4>
+                    <div class="chart-container"><canvas id="chartTopClients"></canvas></div>
+                </div>
+                <div class="chart-card">
+                    <h4><i class="fa-solid fa-chart-pie"></i> Komposisi Beban</h4>
+                    <div class="chart-container"><canvas id="chartExpenses"></canvas></div>
+                </div>
             </div>
+
             <div class="section">
                 <div class="section-header"><h3><i class="fa-solid fa-bolt"></i> Aksi Cepat</h3></div>
-                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px;">
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
                     <button class="btn btn-primary" onclick="syncFromFirebase()"><i class="fa-solid fa-sync"></i> Sync Ecotrack</button>
-                    <button class="btn btn-success" onclick="openModal('modalInvoice')"><i class="fa-solid fa-plus"></i> Invoice</button>
+                    <button class="btn btn-success" onclick="openModal('modalInvoice')"><i class="fa-solid fa-plus"></i> Buat Invoice</button>
                     <button class="btn btn-warning" onclick="openModal('modalExpense')"><i class="fa-solid fa-receipt"></i> Pengeluaran</button>
-                    <button class="btn btn-cyan" onclick="openModal('modalProduction')"><i class="fa-solid fa-flask"></i> Produksi</button>
+                    <button class="btn btn-cyan" onclick="openModal('modalProduction')"><i class="fa-solid fa-flask"></i> Produksi Baru</button>
                 </div>
             </div>
         </div>
@@ -135,109 +219,134 @@
         <!-- RITASE -->
         <div id="tab-ritase" class="tab-content">
             <div class="section">
-                <div class="section-header"><h3>Data Ritase</h3><button class="btn btn-primary" onclick="syncFromFirebase()">Sync</button></div>
-                <div id="loadingRitase" class="loading">Memuat...</div>
-                <div class="table-container" id="tableRitaseContainer" style="display:none;">
-                    <table><thead><tr><th>Tanggal</th><th>Client</th><th>Jenis</th><th>Berat</th><th>Diolah</th><th>Residu</th><th>Petugas</th></tr></thead><tbody id="tbodyRitase"></tbody></table>
-                </div>
+                <div class="section-header"><h3><i class="fa-solid fa-truck-moving"></i> Data Ritase</h3><button class="btn btn-primary" onclick="syncFromFirebase()"><i class="fa-solid fa-sync"></i> Sync</button></div>
+                <div id="loadingRitase" class="loading"><i class="fa-solid fa-spinner"></i><p style="margin-top:15px;">Memuat...</p></div>
+                <div class="table-container" id="tableRitaseContainer" style="display:none;"><table><thead><tr><th>Tanggal</th><th>Client</th><th>Jenis</th><th>Berat</th><th>Diolah</th><th>Residu</th><th>Petugas</th></tr></thead><tbody id="tbodyRitase"></tbody></table></div>
             </div>
         </div>
 
         <!-- CLIENTS -->
         <div id="tab-clients" class="tab-content">
             <div class="section">
-                <div class="section-header"><h3>Client</h3><button class="btn btn-success" onclick="openModal('modalClient')">Tambah</button></div>
-                <div id="loadingClients" class="loading">Memuat...</div>
-                <div class="table-container" id="tableClientsContainer" style="display:none;">
-                    <table><thead><tr><th>Nama</th><th>Tipe</th><th>Tarif</th><th>Status</th><th>Aksi</th></tr></thead><tbody id="tbodyClients"></tbody></table>
-                </div>
+                <div class="section-header"><h3><i class="fa-solid fa-users"></i> Client</h3><button class="btn btn-success" onclick="openModal('modalClient')"><i class="fa-solid fa-plus"></i> Tambah</button></div>
+                <div id="loadingClients" class="loading"><i class="fa-solid fa-spinner"></i><p style="margin-top:15px;">Memuat...</p></div>
+                <div class="table-container" id="tableClientsContainer" style="display:none;"><table><thead><tr><th>Nama</th><th>Tipe</th><th>Tarif</th><th>Status</th><th>Aksi</th></tr></thead><tbody id="tbodyClients"></tbody></table></div>
             </div>
         </div>
 
         <!-- INVOICES -->
         <div id="tab-invoices" class="tab-content">
             <div class="section">
-                <div class="section-header"><h3>Invoice</h3><button class="btn btn-success" onclick="openModal('modalInvoice')">Buat</button></div>
-                <div id="loadingInvoices" class="loading">Memuat...</div>
-                <div class="table-container" id="tableInvoicesContainer" style="display:none;">
-                    <table><thead><tr><th>No</th><th>Client</th><th>Tanggal</th><th>Total</th><th>Status</th><th>Aksi</th></tr></thead><tbody id="tbodyInvoices"></tbody></table>
-                </div>
+                <div class="section-header"><h3><i class="fa-solid fa-file-invoice-dollar"></i> Invoice</h3><button class="btn btn-success" onclick="openModal('modalInvoice')"><i class="fa-solid fa-plus"></i> Buat</button></div>
+                <div id="loadingInvoices" class="loading"><i class="fa-solid fa-spinner"></i><p style="margin-top:15px;">Memuat...</p></div>
+                <div class="table-container" id="tableInvoicesContainer" style="display:none;"><table><thead><tr><th>No</th><th>Client</th><th>Tanggal</th><th>Total</th><th>Status</th><th>Aksi</th></tr></thead><tbody id="tbodyInvoices"></tbody></table></div>
             </div>
         </div>
 
         <!-- EXPENSES -->
         <div id="tab-expenses" class="tab-content">
             <div class="section">
-                <div class="section-header"><h3>Pengeluaran</h3><button class="btn btn-warning" onclick="openModal('modalExpense')">Catat</button></div>
-                <div id="loadingExpenses" class="loading">Memuat...</div>
-                <div class="table-container" id="tableExpensesContainer" style="display:none;">
-                    <table><thead><tr><th>Tanggal</th><th>Kategori</th><th>Keterangan</th><th>Jumlah</th><th>Aksi</th></tr></thead><tbody id="tbodyExpenses"></tbody></table>
-                </div>
+                <div class="section-header"><h3><i class="fa-solid fa-money-bill-wave"></i> Pengeluaran</h3><button class="btn btn-warning" onclick="openModal('modalExpense')"><i class="fa-solid fa-plus"></i> Catat</button></div>
+                <div id="loadingExpenses" class="loading"><i class="fa-solid fa-spinner"></i><p style="margin-top:15px;">Memuat...</p></div>
+                <div class="table-container" id="tableExpensesContainer" style="display:none;"><table><thead><tr><th>Tanggal</th><th>Kategori</th><th>Keterangan</th><th>Jumlah</th><th>Aksi</th></tr></thead><tbody id="tbodyExpenses"></tbody></table></div>
             </div>
         </div>
 
         <!-- ASSETS -->
         <div id="tab-assets" class="tab-content">
             <div class="section">
-                <div class="section-header"><h3>Aset Tetap</h3>
+                <div class="section-header">
+                    <h3><i class="fa-solid fa-truck"></i> Aset Tetap</h3>
                     <div style="display:flex;gap:10px;">
-                        <button class="btn btn-success" onclick="openModal('modalAsset')">Tambah</button>
-                        <button class="btn btn-primary" onclick="calculateDepreciation()">Hitung Penyusutan</button>
+                        <button class="btn btn-success" onclick="openModal('modalAsset')"><i class="fa-solid fa-plus"></i> Tambah</button>
+                        <button class="btn btn-primary" onclick="calculateDepreciation()"><i class="fa-solid fa-calculator"></i> Hitung Penyusutan</button>
                     </div>
                 </div>
-                <div id="loadingAssets" class="loading">Memuat...</div>
-                <div id="tableAssetsContainer"></div>
+                <div id="loadingAssets" class="loading"><i class="fa-solid fa-spinner"></i><p style="margin-top:15px;">Memuat...</p></div>
+                <div id="tableAssetsContainer" style="display:none;"></div>
             </div>
         </div>
 
         <!-- INVENTORY -->
         <div id="tab-inventory" class="tab-content">
             <div class="section">
-                <div class="section-header"><h3>Persediaan</h3>
+                <div class="section-header">
+                    <h3><i class="fa-solid fa-boxes-stacked"></i> Manajemen Persediaan</h3>
                     <div style="display:flex;gap:10px;flex-wrap:wrap;">
-                        <button class="btn btn-success" onclick="openModal('modalProduct')">Produk</button>
-                        <button class="btn btn-info" onclick="openModal('modalStockIn')">Stok Masuk</button>
-                        <button class="btn btn-warning" onclick="openModal('modalStockOut')">Stok Keluar</button>
+                        <button class="btn btn-success" onclick="openModal('modalProduct')"><i class="fa-solid fa-box"></i> Produk Baru</button>
+                        <button class="btn btn-info" onclick="openModal('modalStockIn')"><i class="fa-solid fa-arrow-down"></i> Stok Masuk</button>
+                        <button class="btn btn-warning" onclick="openModal('modalStockOut')"><i class="fa-solid fa-arrow-up"></i> Stok Keluar</button>
                     </div>
                 </div>
-                <div class="stats-grid" style="margin-top:15px;">
-                    <div class="stat-card"><h3>Total Produk</h3><div class="value" id="statProducts">-</div></div>
-                    <div class="stat-card"><h3>Nilai Stok</h3><div class="value" id="statInventoryValue">-</div></div>
+                <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:15px;margin-bottom:25px;">
+                    <div class="stat-card"><i class="fa-solid fa-box"></i><h3>Total Produk</h3><div class="value" id="statProducts">-</div></div>
+                    <div class="stat-card warning"><i class="fa-solid fa-triangle-exclamation"></i><h3>Stok Menipis</h3><div class="value" id="statLowStock">-</div></div>
+                    <div class="stat-card profit"><i class="fa-solid fa-warehouse"></i><h3>Nilai Persediaan</h3><div class="value" id="statInventoryValue">-</div></div>
                 </div>
-                <div id="loadingInventory" class="loading">Memuat...</div>
-                <div id="inventoryContainer"></div>
+                <div id="loadingInventory" class="loading"><i class="fa-solid fa-spinner"></i><p style="margin-top:15px;">Memuat produk...</p></div>
+                <div id="inventoryContainer" style="display:none;"></div>
             </div>
         </div>
 
         <!-- PRODUCTION -->
         <div id="tab-production" class="tab-content">
             <div class="section">
-                <div class="section-header"><h3>Produksi Biopond</h3><button class="btn btn-cyan" onclick="openModal('modalProduction')">Produksi Baru</button></div>
-                <div id="loadingProduction" class="loading">Memuat...</div>
-                <div id="productionContainer"></div>
+                <div class="section-header">
+                    <h3><i class="fa-solid fa-flask"></i> Produksi Biopond</h3>
+                    <button class="btn btn-cyan" onclick="openModal('modalProduction')"><i class="fa-solid fa-plus"></i> Produksi Baru</button>
+                </div>
+                <p style="color: rgba(255,255,255,0.6); margin-bottom: 20px;">
+                    <i class="fa-solid fa-info-circle"></i> Kelola proses produksi: konversi sampah organik menjadi maggot, pupuk, dan produk lainnya.
+                </p>
+                <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:15px;margin-bottom:25px;">
+                    <div class="stat-card info"><i class="fa-solid fa-flask"></i><h3>Produksi Aktif</h3><div class="value" id="statActiveProduction">-</div></div>
+                    <div class="stat-card profit"><i class="fa-solid fa-check-circle"></i><h3>Produksi Selesai</h3><div class="value" id="statCompletedProduction">-</div></div>
+                    <div class="stat-card warning"><i class="fa-solid fa-weight-hanging"></i><h3>Total Bahan Baku</h3><div class="value" id="statTotalInput">-</div></div>
+                    <div class="stat-card"><i class="fa-solid fa-box-open"></i><h3>Total Output</h3><div class="value" id="statTotalOutput">-</div></div>
+                </div>
+                <div id="loadingProduction" class="loading"><i class="fa-solid fa-spinner"></i><p style="margin-top:15px;">Memuat produksi...</p></div>
+                <div id="productionContainer" style="display:none;"></div>
             </div>
         </div>
 
         <!-- REPORTS -->
         <div id="tab-reports" class="tab-content">
             <div class="section">
-                <div class="section-header"><h3>Laporan Keuangan</h3>
-                    <div style="display:flex;gap:10px;">
-                        <button class="btn btn-success btn-sm" onclick="exportLabaRugiExcel()"><i class="fa-solid fa-file-excel"></i> Laba Rugi</button>
-                        <button class="btn btn-info btn-sm" onclick="exportNeracaExcel()"><i class="fa-solid fa-file-excel"></i> Neraca</button>
-                        <button class="btn btn-primary" onclick="loadReports()">Refresh</button>
-                    </div>
+                <div class="section-header"><h3><i class="fa-solid fa-file-lines"></i> Laporan Keuangan</h3><button class="btn btn-primary" onclick="loadReports()"><i class="fa-solid fa-rotate"></i> Refresh</button></div>
+                <div style="display:flex;gap:10px;margin-bottom:20px;flex-wrap:wrap;">
+                    <button class="btn btn-success" onclick="showReport('laba-rugi')"><i class="fa-solid fa-chart-line"></i> Laba Rugi</button>
+                    <button class="btn btn-info" onclick="showReport('neraca')"><i class="fa-solid fa-scale-balanced"></i> Neraca</button>
+                    <button class="btn btn-cyan" onclick="showReport('arus-kas')"><i class="fa-solid fa-money-bill-transfer"></i> Arus Kas</button>
                 </div>
-                <div style="display:flex;gap:10px;margin-bottom:20px;">
-                    <button class="btn btn-success" onclick="showReport('laba-rugi')">Laba Rugi</button>
-                    <button class="btn btn-info" onclick="showReport('neraca')">Neraca</button>
-                    <button class="btn btn-cyan" onclick="showReport('arus-kas')">Arus Kas</button>
-                </div>
-                <div id="loadingReports" class="loading">Menghitung...</div>
+                <div id="loadingReports" class="loading"><i class="fa-solid fa-spinner"></i><p style="margin-top:15px;">Menghitung...</p></div>
                 <div id="reportContent" style="display:none;">
-                    <div id="reportLabaRugi" style="display:none;"><div id="reportRevenue"></div><div id="reportExpense"></div><div id="reportSummary"></div></div>
-                    <div id="reportNeraca" style="display:none;"><div id="reportAssets"></div><div id="reportLiabilities"></div><div id="reportEquity"></div><div id="reportNeracaSummary"></div></div>
-                    <div id="reportArusKas" style="display:none;"><div id="cashflowOperating"></div><div id="cashflowInvesting"></div><div id="cashflowFinancing"></div><div id="cashflowSummary"></div></div>
+                    <div id="reportLabaRugi" style="display:none;">
+                        <div id="reportRevenue"></div>
+                        <div id="reportExpense"></div>
+                        <div id="reportSummary"></div>
+                    </div>
+                    <div id="reportNeraca" style="display:none;">
+                        <div class="report-grid">
+                            <div><div id="reportAssets"></div></div>
+                            <div><div id="reportLiabilities"></div><div id="reportEquity"></div></div>
+                        </div>
+                        <div id="reportNeracaSummary"></div>
+                    </div>
+                    <div id="reportArusKas" style="display:none;">
+                        <div class="cashflow-section">
+                            <h4><i class="fa-solid fa-briefcase"></i> ARUS KAS DARI AKTIVITAS OPERASI</h4>
+                            <div id="cashflowOperating"></div>
+                        </div>
+                        <div class="cashflow-section" style="border-left-color: #3b82f6;">
+                            <h4 style="color: #3b82f6;"><i class="fa-solid fa-building"></i> ARUS KAS DARI AKTIVITAS INVESTASI</h4>
+                            <div id="cashflowInvesting"></div>
+                        </div>
+                        <div class="cashflow-section" style="border-left-color: #a855f7;">
+                            <h4 style="color: #a855f7;"><i class="fa-solid fa-hand-holding-dollar"></i> ARUS KAS DARI AKTIVITAS PENDANAAN</h4>
+                            <div id="cashflowFinancing"></div>
+                        </div>
+                        <div id="cashflowSummary"></div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -246,490 +355,846 @@
     <!-- MODALS -->
     <div class="modal-overlay" id="modalClient">
         <div class="modal">
-            <div class="modal-header"><h3>Tambah Client</h3><button class="modal-close" onclick="closeModal('modalClient')">&times;</button></div>
-            <form onsubmit="saveClient(event)">
-                <div class="form-group"><label>Nama</label><input type="text" id="clientName" required></div>
+            <div class="modal-header"><h3 id="modalClientTitle"><i class="fa-solid fa-user-plus"></i> Tambah Client</h3><button class="modal-close" onclick="closeModal('modalClient')">&times;</button></div>
+            <form id="formClient" onsubmit="saveClient(event)">
+                <div class="form-group"><label>Nama Client *</label><input type="text" id="clientName" required></div>
                 <div class="form-row">
-                    <div class="form-group"><label>Tipe</label><select id="clientType"><option>Restoran</option><option>Rumah</option><option>Pabrik</option><option>Lainnya</option></select></div>
-                    <div class="form-group"><label>Tarif/Ritase</label><input type="number" id="clientTarif" value="15000" required></div>
+                    <div class="form-group"><label>Tipe</label><select id="clientType"><option>Restoran</option><option>Rumah</option><option>Kantor</option><option>Pabrik</option><option>Mall</option><option>Lainnya</option></select></div>
+                    <div class="form-group"><label>No. Telepon</label><input type="text" id="clientPhone"></div>
                 </div>
-                <button type="submit" class="btn btn-success">Simpan</button>
+                <div class="form-group"><label>Alamat</label><textarea id="clientAddress" rows="2"></textarea></div>
+                <div class="form-group"><label>Tarif per Ritase (Rp) *</label><input type="number" id="clientTarif" value="15000" required></div>
+                <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:20px;">
+                    <button type="button" class="btn" style="background:rgba(255,255,255,0.1);color:white;" onclick="closeModal('modalClient')">Batal</button>
+                    <button type="submit" class="btn btn-success"><i class="fa-solid fa-save"></i> Simpan</button>
+                </div>
             </form>
         </div>
     </div>
-    
+
     <div class="modal-overlay" id="modalInvoice">
         <div class="modal">
-            <div class="modal-header"><h3>Buat Invoice</h3><button class="modal-close" onclick="closeModal('modalInvoice')">&times;</button></div>
-            <form onsubmit="saveInvoice(event)">
-                <div class="form-group"><label>Client</label><select id="invoiceClient" required></select></div>
+            <div class="modal-header"><h3><i class="fa-solid fa-file-invoice"></i> Buat Invoice</h3><button class="modal-close" onclick="closeModal('modalInvoice')">&times;</button></div>
+            <form id="formInvoice" onsubmit="saveInvoice(event)">
                 <div class="form-row">
-                    <div class="form-group"><label>Ritase</label><input type="number" id="invoiceVisits" required onchange="calcInvoiceTotal()"></div>
-                    <div class="form-group"><label>Tarif</label><input type="number" id="invoiceTarif" readonly></div>
+                    <div class="form-group"><label>Client *</label><select id="invoiceClient" required></select></div>
+                    <div class="form-group"><label>Periode *</label><input type="month" id="invoicePeriod" required></div>
                 </div>
-                <div class="form-group"><label>Total: <span id="invoiceTotalDisplay">0</span></label><input type="hidden" id="invoiceTotal"></div>
-                <button type="submit" class="btn btn-success">Simpan & Jurnal</button>
+                <div class="form-row">
+                    <div class="form-group"><label>Jumlah Ritase *</label><input type="number" id="invoiceVisits" required min="1" onchange="calcInvoiceTotal()"></div>
+                    <div class="form-group"><label>Total Berat (kg)</label><input type="number" id="invoiceWeight" min="0" value="0"></div>
+                </div>
+                <div class="form-group"><label>Tarif per Ritase (Rp)</label><input type="number" id="invoiceTarif" readonly></div>
+                <div class="form-group"><label style="font-size:18px;color:#4ade80;"><strong>Total: <span id="invoiceTotalDisplay">Rp 0</span></strong></label><input type="hidden" id="invoiceTotal"></div>
+                <div class="form-group"><label>Catatan</label><textarea id="invoiceNotes" rows="2"></textarea></div>
+                <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:20px;">
+                    <button type="button" class="btn" style="background:rgba(255,255,255,0.1);color:white;" onclick="closeModal('modalInvoice')">Batal</button>
+                    <button type="submit" class="btn btn-success"><i class="fa-solid fa-save"></i> Simpan</button>
+                </div>
             </form>
         </div>
     </div>
 
     <div class="modal-overlay" id="modalExpense">
         <div class="modal">
-            <div class="modal-header"><h3>Catat Pengeluaran</h3><button class="modal-close" onclick="closeModal('modalExpense')">&times;</button></div>
-            <form onsubmit="saveExpense(event)">
-                <div class="form-group"><label>Kategori</label><select id="expenseCategory" required>
-                    <option value="5-2010">Retribusi TPA</option><option value="5-2002">BBM</option><option value="5-2001">Gaji</option><option value="5-2005">Listrik</option>
-                </select></div>
+            <div class="modal-header"><h3><i class="fa-solid fa-receipt"></i> Pengeluaran</h3><button class="modal-close" onclick="closeModal('modalExpense')">&times;</button></div>
+            <form id="formExpense" onsubmit="saveExpense(event)">
                 <div class="form-row">
-                    <div class="form-group"><label>Jumlah</label><input type="number" id="expenseAmount" required></div>
-                    <div class="form-group"><label>Tanggal</label><input type="date" id="expenseDate" required></div>
+                    <div class="form-group"><label>Tanggal *</label><input type="date" id="expenseDate" required></div>
+                    <div class="form-group"><label>Kategori *</label><select id="expenseCategory" required>
+                        <option value="">-- Pilih --</option>
+                        <option value="5-2010">Retribusi TPA/RDF</option>
+                        <option value="5-2011">Vendor Pengolahan</option>
+                        <option value="5-2002">BBM Kendaraan</option>
+                        <option value="5-2001">Gaji Karyawan</option>
+                        <option value="5-2003">Maintenance Kendaraan</option>
+                        <option value="5-2004">Maintenance Mesin</option>
+                        <option value="5-2005">Listrik & Air</option>
+                        <option value="5-2006">Perlengkapan</option>
+                        <option value="5-3001">Administrasi Bank</option>
+                        <option value="5-3002">Beban Lain-lain</option>
+                    </select></div>
                 </div>
-                <div class="form-group"><label>Keterangan</label><input type="text" id="expenseDescription"></div>
-                <button type="submit" class="btn btn-warning">Simpan</button>
+                <div class="form-group"><label>Keterangan *</label><input type="text" id="expenseDescription" required></div>
+                <div class="form-row">
+                    <div class="form-group"><label>Jumlah (Rp) *</label><input type="number" id="expenseAmount" required min="1"></div>
+                    <div class="form-group"><label>Dibayar dari *</label><select id="expensePayment" required>
+                        <option value="1-1002">Bank BCA</option>
+                        <option value="1-1003">Bank Mandiri</option>
+                        <option value="1-1001">Kas Kecil</option>
+                    </select></div>
+                </div>
+                <div class="form-group"><label>Catatan</label><textarea id="expenseNotes" rows="2"></textarea></div>
+                <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:20px;">
+                    <button type="button" class="btn" style="background:rgba(255,255,255,0.1);color:white;" onclick="closeModal('modalExpense')">Batal</button>
+                    <button type="submit" class="btn btn-warning"><i class="fa-solid fa-save"></i> Simpan</button>
+                </div>
             </form>
         </div>
     </div>
 
     <div class="modal-overlay" id="modalAsset">
         <div class="modal">
-            <div class="modal-header"><h3>Tambah Aset</h3><button class="modal-close" onclick="closeModal('modalAsset')">&times;</button></div>
-            <form onsubmit="saveAsset(event)">
-                <div class="form-group"><label>Nama Aset</label><input type="text" id="assetName" required></div>
+            <div class="modal-header"><h3 id="modalAssetTitle"><i class="fa-solid fa-truck"></i> Tambah Aset</h3><button class="modal-close" onclick="closeModal('modalAsset')">&times;</button></div>
+            <form id="formAsset" onsubmit="saveAsset(event)">
                 <div class="form-row">
-                    <div class="form-group"><label>Harga Perolehan</label><input type="number" id="assetCost" required></div>
-                    <div class="form-group"><label>Umur (Tahun)</label><input type="number" id="assetLife" value="5" required></div>
+                    <div class="form-group"><label>Kode Aset *</label><input type="text" id="assetCode" required placeholder="TRK-001"></div>
+                    <div class="form-group"><label>Kategori *</label><select id="assetCategory" required>
+                        <option value="KENDARAAN">Kendaraan/Truk</option>
+                        <option value="MESIN">Mesin & Peralatan</option>
+                        <option value="GEDUNG">Gedung</option>
+                    </select></div>
                 </div>
-                <button type="submit" class="btn btn-success">Simpan</button>
+                <div class="form-group"><label>Nama Aset *</label><input type="text" id="assetName" required></div>
+                <div class="form-row">
+                    <div class="form-group"><label>Divisi</label><select id="assetDivision"><option>LOGISTIK</option><option>LIMBAH</option><option>PANGAN</option><option>UMUM</option></select></div>
+                    <div class="form-group"><label>Tanggal Perolehan *</label><input type="date" id="assetAcquisitionDate" required></div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group"><label>Harga Perolehan (Rp) *</label><input type="number" id="assetCost" required min="1"></div>
+                    <div class="form-group"><label>Umur Ekonomis (Tahun) *</label><input type="number" id="assetLife" required min="1" value="5"></div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group"><label>Nilai Sisa (Rp)</label><input type="number" id="assetSalvage" value="0" min="0"></div>
+                    <div class="form-group"><label>Maintenance Berikutnya</label><input type="date" id="assetNextMaintenance"></div>
+                </div>
+                <div class="form-group"><label>Catatan</label><textarea id="assetNotes" rows="2"></textarea></div>
+                <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:20px;">
+                    <button type="button" class="btn" style="background:rgba(255,255,255,0.1);color:white;" onclick="closeModal('modalAsset')">Batal</button>
+                    <button type="submit" class="btn btn-success"><i class="fa-solid fa-save"></i> Simpan</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="modalCategory">
+        <div class="modal">
+            <div class="modal-header"><h3><i class="fa-solid fa-tags"></i> Tambah Kategori Produk</h3><button class="modal-close" onclick="closeModal('modalCategory')">&times;</button></div>
+            <form id="formCategory" onsubmit="saveCategory(event)">
+                <div class="form-group"><label>Nama Kategori *</label><input type="text" id="categoryName" required placeholder="Contoh: Produk Daur Ulang"></div>
+                <div class="form-group"><label>Deskripsi</label><textarea id="categoryDesc" rows="2"></textarea></div>
+                <div class="form-row">
+                    <div class="form-group"><label>Akun Persediaan Default</label><select id="categoryAccountStock">
+                        <option value="1-3001">1-3001 Persediaan Pangan</option>
+                        <option value="1-3002">1-3002 Persediaan Sparepart</option>
+                        <option value="1-3003">1-3003 Persediaan Biopond</option>
+                    </select></div>
+                    <div class="form-group"><label>Akun HPP Default</label><select id="categoryAccountCogs">
+                        <option value="5-1001">5-1001 HPP Pangan</option>
+                        <option value="5-1002">5-1002 HPP Biopond</option>
+                    </select></div>
+                </div>
+                <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:20px;">
+                    <button type="button" class="btn" style="background:rgba(255,255,255,0.1);color:white;" onclick="closeModal('modalCategory')">Batal</button>
+                    <button type="submit" class="btn btn-success"><i class="fa-solid fa-save"></i> Simpan Kategori</button>
+                </div>
             </form>
         </div>
     </div>
 
     <div class="modal-overlay" id="modalProduct">
         <div class="modal">
-            <div class="modal-header"><h3>Tambah Produk</h3><button class="modal-close" onclick="closeModal('modalProduct')">&times;</button></div>
-            <form onsubmit="saveProduct(event)">
-                <div class="form-group"><label>Nama Produk</label><input type="text" id="productName" required></div>
+            <div class="modal-header"><h3 id="modalProductTitle"><i class="fa-solid fa-box"></i> Produk Baru</h3><button class="modal-close" onclick="closeModal('modalProduct')">&times;</button></div>
+            <form id="formProduct" onsubmit="saveProduct(event)">
                 <div class="form-row">
-                    <div class="form-group"><label>Harga Jual</label><input type="number" id="productSellingPrice"></div>
-                    <div class="form-group"><label>Stok Minimum</label><input type="number" id="productMinStock" value="0"></div>
+                    <div class="form-group"><label>Kode Produk *</label><input type="text" id="productCode" required placeholder="BRG-001"></div>
+                    <div class="form-group">
+                        <label>Kategori *</label>
+                        <div class="input-group">
+                            <select id="productCategory" required onchange="autoFillAccounts()"></select>
+                            <button type="button" class="btn btn-sm btn-primary" onclick="openModal('modalCategory')" title="Tambah Kategori Baru"><i class="fa-solid fa-plus"></i></button>
+                        </div>
+                    </div>
                 </div>
-                <button type="submit" class="btn btn-success">Simpan</button>
+                <div class="form-group"><label>Nama Produk *</label><input type="text" id="productName" required></div>
+                <div class="form-row">
+                    <div class="form-group"><label>Divisi *</label><select id="productDivision" required>
+                        <option value="PANGAN">Pangan</option>
+                        <option value="LIMBAH">Limbah/Biopond</option>
+                        <option value="LOGISTIK">Logistik</option>
+                    </select></div>
+                    <div class="form-group"><label>Satuan *</label><select id="productUnit" required>
+                        <option value="Kg">Kilogram (Kg)</option>
+                        <option value="Liter">Liter</option>
+                        <option value="Pcs">Pcs</option>
+                        <option value="Karung">Karung</option>
+                        <option value="Box">Box</option>
+                    </select></div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group"><label>Harga Jual (Rp)</label><input type="number" id="productSellingPrice" value="0" min="0"></div>
+                    <div class="form-group"><label>Stok Minimum</label><input type="number" id="productMinStock" value="0" min="0"></div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group"><label>Akun Persediaan</label><select id="productAccountStock">
+                        <option value="1-3001">1-3001 Persediaan Pangan</option>
+                        <option value="1-3002">1-3002 Persediaan Sparepart</option>
+                        <option value="1-3003">1-3003 Persediaan Biopond</option>
+                    </select></div>
+                    <div class="form-group"><label>Akun HPP</label><select id="productAccountCogs">
+                        <option value="5-1001">5-1001 HPP Pangan</option>
+                        <option value="5-1002">5-1002 HPP Biopond</option>
+                    </select></div>
+                </div>
+                <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:20px;">
+                    <button type="button" class="btn" style="background:rgba(255,255,255,0.1);color:white;" onclick="closeModal('modalProduct')">Batal</button>
+                    <button type="submit" class="btn btn-success"><i class="fa-solid fa-save"></i> Simpan</button>
+                </div>
             </form>
         </div>
     </div>
 
     <div class="modal-overlay" id="modalStockIn">
         <div class="modal">
-            <div class="modal-header"><h3>Stok Masuk</h3><button class="modal-close" onclick="closeModal('modalStockIn')">&times;</button></div>
-            <form onsubmit="saveStockIn(event)">
-                <div class="form-group"><label>Produk</label><select id="stockInProduct" required></select></div>
+            <div class="modal-header"><h3><i class="fa-solid fa-arrow-down"></i> Stok Masuk</h3><button class="modal-close" onclick="closeModal('modalStockIn')">&times;</button></div>
+            <form id="formStockIn" onsubmit="saveStockIn(event)">
                 <div class="form-row">
-                    <div class="form-group"><label>Qty</label><input type="number" id="stockInQty" required></div>
-                    <div class="form-group"><label>Harga Satuan</label><input type="number" id="stockInCost" required></div>
+                    <div class="form-group"><label>Tanggal *</label><input type="date" id="stockInDate" required></div>
+                    <div class="form-group"><label>Produk *</label><select id="stockInProduct" required></select></div>
                 </div>
-                <button type="submit" class="btn btn-info">Simpan</button>
+                <div class="form-row">
+                    <div class="form-group"><label>Jumlah *</label><input type="number" id="stockInQty" required min="0.01" step="0.01"></div>
+                    <div class="form-group"><label>Harga Satuan (Rp) *</label><input type="number" id="stockInCost" required min="0"></div>
+                </div>
+                <div class="form-group"><label>Sumber</label><select id="stockInSource">
+                    <option value="PURCHASE">Pembelian</option>
+                    <option value="PRODUCTION">Produksi (Biopond)</option>
+                    <option value="RETURN">Retur</option>
+                </select></div>
+                <div class="form-group"><label>Catatan</label><textarea id="stockInNotes" rows="2"></textarea></div>
+                <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:20px;">
+                    <button type="button" class="btn" style="background:rgba(255,255,255,0.1);color:white;" onclick="closeModal('modalStockIn')">Batal</button>
+                    <button type="submit" class="btn btn-info"><i class="fa-solid fa-save"></i> Catat Stok Masuk</button>
+                </div>
             </form>
         </div>
     </div>
 
     <div class="modal-overlay" id="modalStockOut">
         <div class="modal">
-            <div class="modal-header"><h3>Stok Keluar</h3><button class="modal-close" onclick="closeModal('modalStockOut')">&times;</button></div>
-            <form onsubmit="saveStockOut(event)">
-                <div class="form-group"><label>Produk</label><select id="stockOutProduct" required></select></div>
-                <div class="form-group"><label>Qty</label><input type="number" id="stockOutQty" required></div>
-                <button type="submit" class="btn btn-warning">Simpan</button>
+            <div class="modal-header"><h3><i class="fa-solid fa-arrow-up"></i> Stok Keluar</h3><button class="modal-close" onclick="closeModal('modalStockOut')">&times;</button></div>
+            <form id="formStockOut" onsubmit="saveStockOut(event)">
+                <div class="form-row">
+                    <div class="form-group"><label>Tanggal *</label><input type="date" id="stockOutDate" required></div>
+                    <div class="form-group"><label>Produk *</label><select id="stockOutProduct" required></select></div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group"><label>Jumlah *</label><input type="number" id="stockOutQty" required min="0.01" step="0.01"></div>
+                    <div class="form-group"><label>Harga Jual (Rp)</label><input type="number" id="stockOutPrice" min="0" value="0"></div>
+                </div>
+                <div class="form-group"><label>Tujuan</label><select id="stockOutDestination">
+                    <option value="SALES">Penjualan</option>
+                    <option value="USAGE">Pemakaian Internal</option>
+                    <option value="DAMAGED">Rusak/Hilang</option>
+                </select></div>
+                <div class="form-group"><label>Catatan</label><textarea id="stockOutNotes" rows="2"></textarea></div>
+                <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:20px;">
+                    <button type="button" class="btn" style="background:rgba(255,255,255,0.1);color:white;" onclick="closeModal('modalStockOut')">Batal</button>
+                    <button type="submit" class="btn btn-warning"><i class="fa-solid fa-save"></i> Catat Stok Keluar</button>
+                </div>
             </form>
         </div>
     </div>
 
     <div class="modal-overlay" id="modalProduction">
-        <div class="modal">
-            <div class="modal-header"><h3>Produksi Baru</h3><button class="modal-close" onclick="closeModal('modalProduction')">&times;</button></div>
-            <p style="color:#aaa; font-size:13px; margin-bottom: 20px;">Gunakan fitur ini untuk mencatat konversi sampah organik menjadi pupuk/maggot.</p>
-            <button class="btn btn-cyan" onclick="closeModal('modalProduction')">Tutup</button>
+        <div class="modal" style="max-width: 800px;">
+            <div class="modal-header"><h3><i class="fa-solid fa-flask"></i> Produksi Biopond Baru</h3><button class="modal-close" onclick="closeModal('modalProduction')">&times;</button></div>
+            <form id="formProduction" onsubmit="saveProduction(event)">
+                <div class="form-row">
+                    <div class="form-group"><label>Nomor Produksi *</label><input type="text" id="productionNumber" required placeholder="PRD-202608-001"></div>
+                    <div class="form-group"><label>Nama Batch</label><input type="text" id="productionBatch" placeholder="Batch Maggot Agustus 2026"></div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group"><label>Tanggal Mulai *</label><input type="date" id="productionStartDate" required></div>
+                    <div class="form-group"><label>Tanggal Selesai</label><input type="date" id="productionEndDate"></div>
+                </div>
+                <h4 style="color: #06b6d4; margin: 20px 0 10px 0; font-size: 14px; text-transform: uppercase; letter-spacing: 1px;">
+                    <i class="fa-solid fa-arrow-down"></i> Bahan Baku (Input)
+                </h4>
+                <div id="productionInputsList" class="dynamic-list"></div>
+                <button type="button" class="add-item-btn" onclick="addProductionInput()"><i class="fa-solid fa-plus"></i> Tambah Bahan Baku</button>
+                <h4 style="color: #10b981; margin: 20px 0 10px 0; font-size: 14px; text-transform: uppercase; letter-spacing: 1px;">
+                    <i class="fa-solid fa-arrow-up"></i> Produk Hasil (Output)
+                </h4>
+                <div id="productionOutputsList" class="dynamic-list"></div>
+                <button type="button" class="add-item-btn" onclick="addProductionOutput()"><i class="fa-solid fa-plus"></i> Tambah Produk Output</button>
+                <div class="form-group" style="margin-top: 20px;">
+                    <label>Catatan Produksi</label>
+                    <textarea id="productionNotes" rows="2" placeholder="Kondisi biopond, suhu, kelembaban, dll"></textarea>
+                </div>
+                <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:20px;">
+                    <button type="button" class="btn" style="background:rgba(255,255,255,0.1);color:white;" onclick="closeModal('modalProduction')">Batal</button>
+                    <button type="submit" class="btn btn-cyan"><i class="fa-solid fa-save"></i> Simpan Produksi</button>
+                </div>
+            </form>
         </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
-        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js";
-        import { getFirestore, collection, getDocs, query, orderBy, where, addDoc, updateDoc, doc } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
+        import { getFirestore, collection, getDocs, query, orderBy } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
 
-        const firebaseConfig = { apiKey: "AIzaSyCd70zeLsmPYBHH1UdKkp4dlrKr57P73yk", authDomain: "ecotrack-184c2.firebaseapp.com", projectId: "ecotrack-184c2", storageBucket: "ecotrack-184c2.firebasestorage.app", messagingSenderId: "703447241523", appId: "1:703447241523:web:0841c9817537b0aa82a446" };
+        const SUPABASE_URL = 'https://givsgpujpmegvnrnyhzp.supabase.co';
+        const SUPABASE_KEY = 'sb_publishable_l-rigo5p2FGRs7wManpDZw_os9IHUFE';
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        const firebaseConfig = { apiKey: "AIzaSyCd70zeLsmPYBHH1UdKkp4dlrKr57P73yk", authDomain: "ecotrack-184c2.firebaseapp.com", projectId: "ecotrack-184c2", storageBucket: "ecotrack-184c2.firebasestorage.app", messagingSenderId: "703447241523", appId: "1:703447241523:web:0841c9817537b0aa82a446", measurementId: "G-4ZTDBCGGRW" };
         const fbApp = initializeApp(firebaseConfig);
-        const fbAuth = getAuth(fbApp);
         const fbDb = getFirestore(fbApp);
-        const supabase = window.supabase.createClient('https://givsgpujpmegvnrnyhzp.supabase.co', 'sb_publishable_l-rigo5p2FGRs7wManpDZw_os9IHUFE');
 
-        let currentUserEmail = '';
-        let allClients = [], allProducts = [], allWasteCollections = [];
+        let allClients = [], allExpenses = [], allAssets = [], allProducts = [], allCategories = [];
+        let allWasteCollections = [];
+        let currentLabaBersih = 0;
+        let productionInputs = [];
+        let productionOutputs = [];
         let charts = {};
 
-        // ===== AUTH CHECK =====
-        onAuthStateChanged(fbAuth, (user) => {
-            if (!user) { window.location.href = 'login.html'; } 
-            else { 
-                currentUserEmail = user.email; 
-                document.getElementById('currentUserName').textContent = user.email; 
-                loadDashboard(); 
-            }
-        });
+        function formatRupiah(n) { if (!n) return 'Rp 0'; return 'Rp ' + n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, "."); }
+        function showAlert(msg, type = 'info') { const c = document.getElementById('alertContainer'); const ic = type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : 'info-circle'; c.innerHTML = `<div class="alert alert-${type}"><i class="fa-solid fa-${ic}"></i> ${msg}</div>`; setTimeout(() => { c.innerHTML = ''; }, 5000); }
 
-        // ===== LOGOUT BUTTON (FIXED & VERIFIED) =====
-        document.getElementById('btnLogout').addEventListener('click', function(e) {
-            e.preventDefault();
-            if (confirm('Yakin ingin keluar dari sistem?')) {
-                signOut(fbAuth).then(() => {
-                    window.location.href = 'login.html';
-                }).catch((error) => {
-                    alert('Gagal logout: ' + error.message);
-                });
-            }
-        });
-
-        window.switchTab = (t) => { 
-            document.querySelectorAll('.tab-content').forEach(x => x.classList.remove('active')); 
-            document.querySelectorAll('.tab-btn').forEach(x => x.classList.remove('active')); 
-            document.getElementById('tab-' + t).classList.add('active'); 
-            document.querySelector(`[data-tab="${t}"]`).classList.add('active'); 
-            if(t==='ritase') loadRitase(); 
-            if(t==='clients') loadClients(); 
-            if(t==='invoices') loadInvoices(); 
-            if(t==='expenses') loadExpenses(); 
-            if(t==='assets') loadAssets(); 
-            if(t==='inventory') loadInventory(); 
-            if(t==='production') loadProduction(); 
-            if(t==='reports') loadReports(); 
+        window.switchTab = function(t) {
+            document.querySelectorAll('.tab-content').forEach(x => x.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(x => x.classList.remove('active'));
+            document.getElementById('tab-' + t).classList.add('active');
+            event.target.closest('.tab-btn').classList.add('active');
+            const loaders = { dashboard: loadDashboard, ritase: loadRitase, clients: loadClients, invoices: loadInvoices, expenses: loadExpenses, assets: loadAssets, inventory: loadInventory, production: loadProduction, reports: loadReports };
+            if (loaders[t]) loaders[t]();
         };
-        
-        window.openModal = (id) => { 
+
+        window.showReport = function(type) {
+            document.getElementById('reportLabaRugi').style.display = type === 'laba-rugi' ? 'block' : 'none';
+            document.getElementById('reportNeraca').style.display = type === 'neraca' ? 'block' : 'none';
+            document.getElementById('reportArusKas').style.display = type === 'arus-kas' ? 'block' : 'none';
+        };
+
+        window.openModal = function(id) { 
             if(id==='modalInvoice') populateClientSelect(); 
-            if(id==='modalStockIn' || id==='modalStockOut') populateProductSelect(id); 
+            if(id==='modalStockIn'||id==='modalStockOut') populateProductSelect(id); 
             document.getElementById(id).classList.add('active'); 
         };
-        
-        window.closeModal = (id) => document.getElementById(id).classList.remove('active');
-        
-        function formatRupiah(n) { return 'Rp ' + (n||0).toString().replace(/\B(?=(\d{3})+(?!\d))/g, "."); }
-        function showAlert(msg, type='success') { const c = document.getElementById('alertContainer'); c.innerHTML = `<div class="alert alert-${type}">${msg}</div>`; setTimeout(() => c.innerHTML = '', 3000); }
+        window.closeModal = function(id) { document.getElementById(id).classList.remove('active'); };
+
+        window.addProductionInput = function() { const id = Date.now(); productionInputs.push({ id, waste_collection_id: '', material_type: 'SAMPAH_ORGANIK', quantity: 0, unit: 'Kg' }); renderProductionInputs(); };
+        window.addProductionOutput = function() { const id = Date.now(); productionOutputs.push({ id, product_id: '', quantity: 0, unit: 'Kg' }); renderProductionOutputs(); };
+        window.removeProductionInput = function(id) { productionInputs = productionInputs.filter(x => x.id !== id); renderProductionInputs(); };
+        window.removeProductionOutput = function(id) { productionOutputs = productionOutputs.filter(x => x.id !== id); renderProductionOutputs(); };
+        window.updateProductionInput = function(id, field, value) { const item = productionInputs.find(x => x.id === id); if (item) item[field] = value; };
+        window.updateProductionOutput = function(id, field, value) { const item = productionOutputs.find(x => x.id === id); if (item) item[field] = value; };
+
+        function renderProductionInputs() {
+            const container = document.getElementById('productionInputsList');
+            container.innerHTML = '';
+            productionInputs.forEach(item => {
+                const div = document.createElement('div');
+                div.className = 'dynamic-item';
+                div.innerHTML = `
+                    <div class="dynamic-item-info" style="flex:2;"><strong>Sumber Sampah</strong><select onchange="updateProductionInput(${item.id}, 'waste_collection_id', this.value)" style="margin-top:5px;"><option value="">-- Pilih Ritase --</option>${allWasteCollections.map(w => `<option value="${w.id}" ${item.waste_collection_id === w.id ? 'selected' : ''}>${w.collection_date ? new Date(w.collection_date).toLocaleDateString('id-ID') : '-'} - ${w.jenis || 'Sampah'} (${w.berat_total || 0} kg)</option>`).join('')}</select></div>
+                    <div class="dynamic-item-info"><strong>Jenis</strong><select onchange="updateProductionInput(${item.id}, 'material_type', this.value)" style="margin-top:5px;"><option value="SAMPAH_ORGANIK" ${item.material_type === 'SAMPAH_ORGANIK' ? 'selected' : ''}>Organik</option><option value="LIMBAH_MAKANAN" ${item.material_type === 'LIMBAH_MAKANAN' ? 'selected' : ''}>Limbah Makanan</option><option value="LAINNYA" ${item.material_type === 'LAINNYA' ? 'selected' : ''}>Lainnya</option></select></div>
+                    <div class="dynamic-item-info" style="flex:0.5;"><strong>Qty (kg)</strong><input type="number" step="0.01" value="${item.quantity}" onchange="updateProductionInput(${item.id}, 'quantity', parseFloat(this.value))" style="margin-top:5px; width:80px;"></div>
+                    <button type="button" class="btn btn-xs btn-danger" onclick="removeProductionInput(${item.id})"><i class="fa-solid fa-trash"></i></button>`;
+                container.appendChild(div);
+            });
+        }
+
+        function renderProductionOutputs() {
+            const container = document.getElementById('productionOutputsList');
+            container.innerHTML = '';
+            productionOutputs.forEach(item => {
+                const div = document.createElement('div');
+                div.className = 'dynamic-item';
+                div.innerHTML = `
+                    <div class="dynamic-item-info" style="flex:2;"><strong>Produk</strong><select onchange="updateProductionOutput(${item.id}, 'product_id', this.value)" style="margin-top:5px;"><option value="">-- Pilih Produk --</option>${allProducts.map(p => `<option value="${p.id}" ${item.product_id === p.id ? 'selected' : ''}>${p.code} - ${p.name} (${p.unit})</option>`).join('')}</select></div>
+                    <div class="dynamic-item-info" style="flex:0.5;"><strong>Qty</strong><input type="number" step="0.01" value="${item.quantity}" onchange="updateProductionOutput(${item.id}, 'quantity', parseFloat(this.value))" style="margin-top:5px; width:80px;"></div>
+                    <div class="dynamic-item-info" style="flex:0.5;"><strong>Satuan</strong><select onchange="updateProductionOutput(${item.id}, 'unit', this.value)" style="margin-top:5px;"><option value="Kg" ${item.unit === 'Kg' ? 'selected' : ''}>Kg</option><option value="Liter" ${item.unit === 'Liter' ? 'selected' : ''}>Liter</option><option value="Pcs" ${item.unit === 'Pcs' ? 'selected' : ''}>Pcs</option></select></div>
+                    <button type="button" class="btn btn-xs btn-danger" onclick="removeProductionOutput(${item.id})"><i class="fa-solid fa-trash"></i></button>`;
+                container.appendChild(div);
+            });
+        }
 
         async function loadDashboard() {
-            const { data: inv } = await supabase.from('invoices').select('*');
-            const { data: exp } = await supabase.from('expenses').select('*');
-            const { data: cli } = await supabase.from('clients').select('*');
-            const tp = inv ? inv.reduce((s, i) => s + (i.total_amount||0), 0) : 0;
-            const te = exp ? exp.reduce((s, e) => s + (e.amount||0), 0) : 0;
-            document.getElementById('statPendapatan').textContent = formatRupiah(tp);
-            document.getElementById('statPengeluaran').textContent = formatRupiah(te);
-            document.getElementById('statLaba').textContent = formatRupiah(tp - te);
-            document.getElementById('statClient').textContent = cli ? cli.length : 0;
-            loadCharts(inv, exp);
+            try {
+                const { data: ritase } = await supabase.from('waste_collections').select('*');
+                const { data: clients } = await supabase.from('clients').select('*').eq('is_active', true);
+                const { data: invoices } = await supabase.from('invoices').select('*');
+                const { data: expenses } = await supabase.from('expenses').select('*');
+                const tp = invoices ? invoices.reduce((s, i) => s + (i.total_amount || 0), 0) : 0;
+                const te = expenses ? expenses.reduce((s, e) => s + (e.amount || 0), 0) : 0;
+                document.getElementById('statRitase').textContent = ritase ? ritase.length : 0;
+                document.getElementById('statBerat').textContent = (ritase ? ritase.reduce((s, r) => s + (r.berat_total || 0), 0) : 0).toLocaleString('id-ID') + ' kg';
+                document.getElementById('statDiolah').textContent = (ritase ? ritase.reduce((s, r) => s + (r.diolah || 0), 0) : 0).toLocaleString('id-ID') + ' kg';
+                document.getElementById('statClient').textContent = clients ? clients.length : 0;
+                document.getElementById('statPending').textContent = invoices ? invoices.filter(i => i.status === 'UNPAID').length : 0;
+                document.getElementById('statPendapatan').textContent = formatRupiah(tp);
+                document.getElementById('statPengeluaran').textContent = formatRupiah(te);
+                document.getElementById('statLaba').textContent = formatRupiah(tp - te);
+                await loadCharts(invoices, expenses, clients);
+            } catch (e) { console.error(e); }
         }
 
-        function loadCharts(inv, exp) {
-            Object.values(charts).forEach(c => c?.destroy());
+        async function loadCharts(invoices, expenses, clients) {
+            Object.values(charts).forEach(c => c && c.destroy());
+            charts = {};
+            const monthlyData = {};
+            (invoices || []).forEach(inv => {
+                const month = inv.period_month || inv.invoice_date?.substring(0, 7);
+                if (month) {
+                    if (!monthlyData[month]) monthlyData[month] = { revenue: 0, expense: 0 };
+                    monthlyData[month].revenue += inv.total_amount || 0;
+                }
+            });
+            (expenses || []).forEach(exp => {
+                const month = exp.expense_date?.substring(0, 7);
+                if (month) {
+                    if (!monthlyData[month]) monthlyData[month] = { revenue: 0, expense: 0 };
+                    monthlyData[month].expense += exp.amount || 0;
+                }
+            });
+            const sortedMonths = Object.keys(monthlyData).sort();
+            const revenueData = sortedMonths.map(m => monthlyData[m].revenue);
+            const expenseData = sortedMonths.map(m => monthlyData[m].expense);
+            const monthLabels = sortedMonths.map(m => {
+                const [y, mo] = m.split('-');
+                const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Ags', 'Sep', 'Okt', 'Nov', 'Des'];
+                return `${monthNames[parseInt(mo) - 1]} ${y}`;
+            });
             const ctx1 = document.getElementById('chartRevenueExpense').getContext('2d');
-            charts.revenueExpense = new Chart(ctx1, { type: 'line', data: { labels: ['Jan','Feb','Mar','Apr','Mei','Jun'], datasets: [{ label: 'Pendapatan', data: [0,0,0,0,0,0], borderColor: '#4ade80', backgroundColor: 'rgba(74,222,128,0.1)', fill: true }, { label: 'Pengeluaran', data: [0,0,0,0,0,0], borderColor: '#ef4444', backgroundColor: 'rgba(239,68,68,0.1)', fill: true }] }, options: { responsive: true, maintainAspectRatio: false } });
+            charts.revenueExpense = new Chart(ctx1, {
+                type: 'line',
+                data: {
+                    labels: monthLabels.length > 0 ? monthLabels : ['Belum ada data'],
+                    datasets: [
+                        { label: 'Pendapatan', data: revenueData.length > 0 ? revenueData : [0], borderColor: '#4ade80', backgroundColor: 'rgba(74, 222, 128, 0.1)', borderWidth: 3, fill: true, tension: 0.4 },
+                        { label: 'Pengeluaran', data: expenseData.length > 0 ? expenseData : [0], borderColor: '#ef4444', backgroundColor: 'rgba(239, 68, 68, 0.1)', borderWidth: 3, fill: true, tension: 0.4 }
+                    ]
+                },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { labels: { color: '#fff' } } }, scales: { x: { ticks: { color: 'rgba(255,255,255,0.7)' }, grid: { color: 'rgba(255,255,255,0.05)' } }, y: { ticks: { color: 'rgba(255,255,255,0.7)', callback: v => 'Rp ' + (v/1000000).toFixed(1) + 'jt' }, grid: { color: 'rgba(255,255,255,0.05)' } } } }
+            });
+            const paidCount = (invoices || []).filter(i => i.status === 'PAID').length;
+            const unpaidCount = (invoices || []).filter(i => i.status === 'UNPAID').length;
+            const partialCount = (invoices || []).filter(i => i.status === 'PARTIAL').length;
             const ctx2 = document.getElementById('chartInvoiceStatus').getContext('2d');
-            const paid = inv ? inv.filter(i => i.status === 'PAID').length : 0;
-            const unpaid = inv ? inv.filter(i => i.status === 'UNPAID').length : 0;
-            charts.invoiceStatus = new Chart(ctx2, { type: 'pie', data: { labels: ['Lunas','Belum'], datasets: [{ data: [paid, unpaid], backgroundColor: ['#4ade80','#fbbf24'] }] }, options: { responsive: true, maintainAspectRatio: false } });
+            charts.invoiceStatus = new Chart(ctx2, { type: 'pie', data: { labels: ['Lunas', 'Belum Bayar', 'Sebagian'], datasets: [{ data: [paidCount, unpaidCount, partialCount], backgroundColor: ['#4ade80', '#fbbf24', '#3b82f6'], borderColor: 'rgba(255,255,255,0.1)', borderWidth: 2 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { color: '#fff', padding: 15 } } } } });
+            const clientRevenue = {};
+            (invoices || []).forEach(inv => { const clientName = inv.clients?.name || 'Unknown'; clientRevenue[clientName] = (clientRevenue[clientName] || 0) + (inv.total_amount || 0); });
+            const sortedClients = Object.entries(clientRevenue).sort((a, b) => b[1] - a[1]).slice(0, 5);
+            const ctx3 = document.getElementById('chartTopClients').getContext('2d');
+            charts.topClients = new Chart(ctx3, { type: 'bar', data: { labels: sortedClients.map(c => c[0]).length > 0 ? sortedClients.map(c => c[0]) : ['Belum ada data'], datasets: [{ label: 'Total Pendapatan', data: sortedClients.map(c => c[1]).length > 0 ? sortedClients.map(c => c[1]) : [0], backgroundColor: 'rgba(74, 222, 128, 0.6)', borderColor: '#4ade80', borderWidth: 2, borderRadius: 8 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { labels: { color: '#fff' } } }, scales: { x: { ticks: { color: 'rgba(255,255,255,0.7)' }, grid: { color: 'rgba(255,255,255,0.05)' } }, y: { ticks: { color: 'rgba(255,255,255,0.7)', callback: v => 'Rp ' + (v/1000000).toFixed(1) + 'jt' }, grid: { color: 'rgba(255,255,255,0.05)' } } } } });
+            const expenseByCategory = {};
+            const categoryNames = { '5-2010': 'Retribusi TPA/RDF', '5-2011': 'Vendor Pengolahan', '5-2002': 'BBM Kendaraan', '5-2001': 'Gaji Karyawan', '5-2003': 'Maint. Kendaraan', '5-2004': 'Maint. Mesin', '5-2005': 'Listrik & Air', '5-2006': 'Perlengkapan', '5-3001': 'Admin Bank', '5-3002': 'Beban Lain-lain' };
+            (expenses || []).forEach(exp => { const catName = categoryNames[exp.account_code] || exp.account_code || 'Lainnya'; expenseByCategory[catName] = (expenseByCategory[catName] || 0) + (exp.amount || 0); });
+            const chartColors = ['#4ade80', '#3b82f6', '#f59e0b', '#ef4444', '#a855f7', '#06b6d4', '#ec4899', '#84cc16', '#f97316', '#14b8a6'];
+            const ctx4 = document.getElementById('chartExpenses').getContext('2d');
+            charts.expenses = new Chart(ctx4, { type: 'doughnut', data: { labels: Object.keys(expenseByCategory).length > 0 ? Object.keys(expenseByCategory) : ['Belum ada data'], datasets: [{ data: Object.values(expenseByCategory).length > 0 ? Object.values(expenseByCategory) : [0], backgroundColor: chartColors, borderColor: 'rgba(255,255,255,0.1)', borderWidth: 2 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { color: '#fff', padding: 10, font: { size: 11 } } } } } });
         }
 
-        window.syncFromFirebase = async () => { 
-            showAlert('Sinkronisasi dimulai...', 'info'); 
+        window.syncFromFirebase = async function() {
+            showAlert('Sinkronisasi...', 'info');
             try {
                 const q = query(collection(fbDb, "sampah"), orderBy("createdAt", "desc"));
                 const snapshot = await getDocs(q);
                 let synced = 0;
-                for (const docSnap of snapshot.docs) {
-                    const data = docSnap.data();
-                    const { data: existing } = await supabase.from('waste_collections').select('id').eq('firebase_doc_id', docSnap.id).single();
+                for (const doc of snapshot.docs) {
+                    const data = doc.data();
+                    const { data: existing } = await supabase.from('waste_collections').select('id').eq('firebase_doc_id', doc.id).single();
                     if (!existing) {
-                        await supabase.from('waste_collections').insert({ firebase_doc_id: docSnap.id, collection_date: data.createdAt ? new Date(data.createdAt.seconds * 1000).toISOString() : null, berat_total: data.berat || 0, diolah: data.diolah || 0, residu: data.residu || 0, jenis: data.jenis || null, petugas: data.petugas || null, status_invoice: 'PENDING' });
+                        let clientId = null;
+                        if (data.client && data.client !== '-') { const { data: cd } = await supabase.from('clients').select('id').eq('name', data.client).single(); clientId = cd?.id || null; }
+                        await supabase.from('waste_collections').insert({ firebase_doc_id: doc.id, no_surat: data.noSurat || null, client_id: clientId, collection_date: data.createdAt ? new Date(data.createdAt.seconds * 1000).toISOString() : null, berat_total: data.berat || 0, diolah: data.diolah || 0, residu: data.residu || 0, jenis: data.jenis || null, petugas: data.petugas || null, created_by: data.createdBy || null, catatan: data.catatan || null, status_invoice: 'PENDING' });
                         synced++;
                     }
                 }
-                showAlert(`${synced} data ritase berhasil disinkronisasi!`, 'success');
+                showAlert(`${synced} data baru.`, 'success');
                 loadDashboard(); loadRitase();
-            } catch (e) { showAlert('Gagal sync: ' + e.message, 'error'); }
+            } catch (e) { showAlert('Gagal: ' + e.message, 'error'); }
         };
 
-        async function loadRitase() { 
-            document.getElementById('loadingRitase').style.display='block'; 
-            const { data } = await supabase.from('waste_collections').select('*, clients(name)').order('collection_date', {ascending: false}); 
-            document.getElementById('loadingRitase').style.display='none'; 
-            document.getElementById('tableRitaseContainer').style.display='block'; 
-            const tbody = document.getElementById('tbodyRitase'); tbody.innerHTML = ''; 
-            (data||[]).forEach(i => { 
-                const tgl = i.collection_date ? new Date(i.collection_date).toLocaleDateString('id-ID') : '-';
-                tbody.innerHTML += `<tr><td>${tgl}</td><td>${i.clients?.name||'-'}</td><td>${i.jenis||'-'}</td><td>${i.berat_total} kg</td><td>${i.diolah} kg</td><td>${i.residu} kg</td><td>${i.petugas||'-'}</td></tr>`; 
-            }); 
+        async function loadRitase() {
+            document.getElementById('loadingRitase').style.display = 'block'; document.getElementById('tableRitaseContainer').style.display = 'none';
+            try {
+                const { data, error } = await supabase.from('waste_collections').select('*, clients(name)').order('collection_date', { ascending: false });
+                document.getElementById('loadingRitase').style.display = 'none'; if (error) throw error;
+                allWasteCollections = data || [];
+                document.getElementById('tableRitaseContainer').style.display = 'block'; const tbody = document.getElementById('tbodyRitase'); tbody.innerHTML = '';
+                if (!data || data.length === 0) { tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:40px;">Belum ada data.</td></tr>'; return; }
+                data.forEach(item => { const tr = document.createElement('tr'); const tgl = item.collection_date ? new Date(item.collection_date).toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' }) : '-'; tr.innerHTML = `<td>${tgl}</td><td><strong>${item.clients?.name || '-'}</strong></td><td>${item.jenis || '-'}</td><td>${(item.berat_total || 0).toLocaleString('id-ID')} kg</td><td>${(item.diolah || 0).toLocaleString('id-ID')} kg</td><td>${(item.residu || 0).toLocaleString('id-ID')} kg</td><td>${item.petugas || '-'}</td>`; tbody.appendChild(tr); });
+            } catch (e) { showAlert('Gagal: ' + e.message, 'error'); }
         }
-        
-        async function loadClients() { 
-            document.getElementById('loadingClients').style.display='block'; 
-            const { data } = await supabase.from('clients').select('*').order('name'); 
-            document.getElementById('loadingClients').style.display='none'; 
-            document.getElementById('tableClientsContainer').style.display='block'; 
-            allClients = data||[]; 
-            const tbody = document.getElementById('tbodyClients'); tbody.innerHTML = ''; 
-            allClients.forEach(c => { 
-                tbody.innerHTML += `<tr><td><strong>${c.name}</strong></td><td>${c.type||'-'}</td><td>${formatRupiah(c.tariff_per_visit)}</td><td><span class="badge badge-paid">Aktif</span></td><td><button class="btn btn-sm btn-danger" onclick="deleteClient('${c.id}')">Hapus</button></td></tr>`; 
-            }); 
+
+        async function loadClients() {
+            document.getElementById('loadingClients').style.display = 'block'; document.getElementById('tableClientsContainer').style.display = 'none';
+            try {
+                const { data, error } = await supabase.from('clients').select('*').order('name');
+                document.getElementById('loadingClients').style.display = 'none'; if (error) throw error;
+                allClients = data || []; document.getElementById('tableClientsContainer').style.display = 'block'; const tbody = document.getElementById('tbodyClients'); tbody.innerHTML = '';
+                if (allClients.length === 0) { tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:40px;">Belum ada client.</td></tr>'; return; }
+                allClients.forEach(c => { const tr = document.createElement('tr'); tr.innerHTML = `<td><strong>${c.name}</strong></td><td>${c.type || '-'}</td><td>${formatRupiah(c.tariff_per_visit)}</td><td><span class="badge ${c.is_active ? 'badge-paid' : 'badge-pending'}">${c.is_active ? 'Aktif' : 'Nonaktif'}</span></td><td><button class="btn btn-sm btn-warning" onclick="editClient('${c.id}')" style="margin-right:5px;"><i class="fa-solid fa-pen"></i></button><button class="btn btn-sm btn-danger" onclick="deleteClient('${c.id}')"><i class="fa-solid fa-trash"></i></button></td>`; tbody.appendChild(tr); });
+            } catch (e) { showAlert('Gagal: ' + e.message, 'error'); }
         }
+
+        window.editClient = function(id) { const c = allClients.find(x => x.id === id); if (!c) return; document.getElementById('clientName').value = c.name; document.getElementById('clientType').value = c.type || 'Restoran'; document.getElementById('clientPhone').value = c.phone || ''; document.getElementById('clientAddress').value = c.address || ''; document.getElementById('clientTarif').value = c.tariff_per_visit; document.getElementById('formClient').dataset.editId = id; document.getElementById('modalClientTitle').innerHTML = '<i class="fa-solid fa-pen"></i> Edit Client'; document.getElementById('modalClient').classList.add('active'); };
         
-        window.saveClient = async (e) => { 
-            e.preventDefault(); 
-            const { error } = await supabase.from('clients').insert({ name: document.getElementById('clientName').value, type: document.getElementById('clientType').value, tariff_per_visit: parseFloat(document.getElementById('clientTarif').value), is_active: true }); 
-            if(!error) { showAlert('Client berhasil disimpan!'); closeModal('modalClient'); document.getElementById('clientName').value=''; loadClients(); } 
-            else { showAlert('Gagal: ' + error.message, 'error'); }
-        };
-        
-        window.deleteClient = async (id) => { 
-            if(confirm('Yakin hapus client ini?')) { 
-                await supabase.from('clients').delete().eq('id', id); 
-                loadClients(); 
-            } 
+        window.saveClient = async function(e) {
+            e.preventDefault(); const editId = document.getElementById('formClient').dataset.editId; const clientName = document.getElementById('clientName').value;
+            const data = { name: clientName, type: document.getElementById('clientType').value, phone: document.getElementById('clientPhone').value, address: document.getElementById('clientAddress').value, tariff_per_visit: parseFloat(document.getElementById('clientTarif').value), monthly_retribution: 0, is_active: true };
+            try {
+                if (editId) { const { error } = await supabase.from('clients').update(data).eq('id', editId); if (error) throw error; showAlert('Client diupdate!', 'success'); } 
+                else { const { error } = await supabase.from('clients').insert(data); if (error) throw error; showAlert('Client ditambahkan!', 'success'); }
+                const { collection, addDoc, getDocs, query, where } = await import("https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js");
+                const usersRef = collection(fbDb, "users"); const q = query(usersRef, where("client", "==", clientName)); const qs = await getDocs(q); const email = `${clientName.toLowerCase().replace(/\s+/g, '')}@raj.com`;
+                if (editId && !qs.empty) { const ud = qs.docs[0]; const { doc, updateDoc } = await import("https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js"); await updateDoc(doc(fbDb, "users", ud.id), { client: clientName, email: email, room: clientName }); } 
+                else if (qs.empty) { await addDoc(usersRef, { client: clientName, email: email, role: "user", room: clientName, createdAt: new Date(), phone: data.phone, address: data.address, type: data.type }); showAlert('Client juga ditambahkan ke Ecotrack!', 'success'); }
+                closeModal('modalClient'); document.getElementById('formClient').reset(); delete document.getElementById('formClient').dataset.editId; document.getElementById('modalClientTitle').innerHTML = '<i class="fa-solid fa-user-plus"></i> Tambah Client'; loadClients();
+            } catch (e) { showAlert('Gagal: ' + e.message, 'error'); }
         };
 
-        function populateClientSelect() { 
-            const s = document.getElementById('invoiceClient'); 
-            s.innerHTML = '<option value="">Pilih Client</option>'; 
-            allClients.forEach(c => { 
-                s.innerHTML += `<option value="${c.id}" data-tarif="${c.tariff_per_visit}">${c.name}</option>`; 
-            }); 
-            s.onchange = function() { 
-                document.getElementById('invoiceTarif').value = this.options[this.selectedIndex].dataset.tarif||0; 
-                calcInvoiceTotal(); 
-            }; 
-        }
+        window.deleteClient = async function(id) { if (!confirm('Yakin hapus?')) return; try { const { error } = await supabase.from('clients').delete().eq('id', id); if (error) throw error; showAlert('Client dihapus.', 'success'); loadClients(); } catch (e) { showAlert('Gagal: ' + e.message, 'error'); } };
         
-        window.calcInvoiceTotal = () => { 
-            const v = parseFloat(document.getElementById('invoiceVisits').value)||0; 
-            const t = parseFloat(document.getElementById('invoiceTarif').value)||0; 
-            const total = v*t; 
-            document.getElementById('invoiceTotal').value = total; 
-            document.getElementById('invoiceTotalDisplay').textContent = formatRupiah(total); 
-        };
+        function populateClientSelect() { const s = document.getElementById('invoiceClient'); s.innerHTML = '<option value="">-- Pilih --</option>'; allClients.forEach(c => { s.innerHTML += `<option value="${c.id}" data-tarif="${c.tariff_per_visit}">${c.name}</option>`; }); s.onchange = function() { const o = s.options[s.selectedIndex]; document.getElementById('invoiceTarif').value = o.dataset.tarif || 0; calcInvoiceTotal(); }; }
+        window.calcInvoiceTotal = function() { const v = parseFloat(document.getElementById('invoiceVisits').value) || 0; const t = parseFloat(document.getElementById('invoiceTarif').value) || 0; const total = v * t; document.getElementById('invoiceTotal').value = total; document.getElementById('invoiceTotalDisplay').textContent = formatRupiah(total); };
         
-        window.saveInvoice = async (e) => { 
-            e.preventDefault(); 
-            const clientId = document.getElementById('invoiceClient').value; 
-            const clientName = document.getElementById('invoiceClient').options[document.getElementById('invoiceClient').selectedIndex].text;
-            const total = parseFloat(document.getElementById('invoiceTotal').value); 
-            const today = new Date().toISOString().split('T')[0];
-            const invNo = 'INV-' + today.replace(/-/g, '').substring(0,6) + '-' + Math.floor(Math.random()*1000);
-            
-            const { data: inv, error: invErr } = await supabase.from('invoices').insert({ invoice_number: invNo, client_id: clientId, total_amount: total, status: 'UNPAID', invoice_date: today }).select().single(); 
-            
-            if(invErr) { showAlert('Gagal: ' + invErr.message, 'error'); return; }
-
-            const { data: akunPiutang } = await supabase.from('accounts').select('id').eq('code', '1-2000').single();
-            const { data: akunJasa } = await supabase.from('accounts').select('id').eq('code', '4-1001').single();
-            if(akunPiutang && akunJasa) {
-                const { data: journal } = await supabase.from('journal_entries').insert({ entry_date: today, reference_type: 'INVOICE', reference_id: inv.id, description: `Invoice ${invNo} - ${clientName}`, status: 'POSTED' }).select().single();
-                if(journal) {
-                    await supabase.from('journal_entry_lines').insert([
-                        { journal_entry_id: journal.id, account_id: akunPiutang.id, debit: total, credit: 0, description: `Piutang ${clientName}` },
-                        { journal_entry_id: journal.id, account_id: akunJasa.id, debit: 0, credit: total, description: `Pendapatan Jasa Angkut` }
-                    ]);
+        window.saveInvoice = async function(e) {
+            e.preventDefault(); const clientId = document.getElementById('invoiceClient').value; const clientName = document.getElementById('invoiceClient').options[document.getElementById('invoiceClient').selectedIndex].text; const period = document.getElementById('invoicePeriod').value; const visits = parseInt(document.getElementById('invoiceVisits').value); const weight = parseFloat(document.getElementById('invoiceWeight').value) || 0; const total = parseFloat(document.getElementById('invoiceTotal').value); const notes = document.getElementById('invoiceNotes').value;
+            const invNo = 'INV-' + period.replace('-', '') + '-' + String(Math.floor(Math.random() * 1000)).padStart(3, '0'); const today = new Date().toISOString().split('T')[0];
+            try {
+                const { data: invoice, error: ie } = await supabase.from('invoices').insert({ invoice_number: invNo, client_id: clientId, invoice_date: today, due_date: today, period_month: period, total_visits: visits, total_weight: weight, amount_visits: total, amount_retribution: 0, total_amount: total, status: 'UNPAID', notes: notes }).select().single();
+                if (ie) throw ie;
+                const jn = 'JV-' + period.replace('-', '') + '-' + String(Math.floor(Math.random() * 1000)).padStart(3, '0');
+                const { data: ap } = await supabase.from('accounts').select('id').eq('code', '1-2000').single(); const { data: aj } = await supabase.from('accounts').select('id').eq('code', '4-1001').single();
+                if (ap && aj) {
+                    const { data: j } = await supabase.from('journal_entries').insert({ entry_number: jn, entry_date: today, reference_type: 'SALES_INVOICE', reference_id: invoice.id, description: `Invoice ${invNo} - ${clientName}`, status: 'POSTED', created_by: 'admin@raj.com' }).select().single();
+                    await supabase.from('journal_entry_lines').insert([ { journal_entry_id: j.id, account_id: ap.id, debit: total, credit: 0, description: `Piutang ${clientName}` }, { journal_entry_id: j.id, account_id: aj.id, debit: 0, credit: total, description: `Pendapatan Jasa Angkut` } ]);
                 }
-            }
-            
-            showAlert('Invoice & Jurnal berhasil dibuat!'); 
-            closeModal('modalInvoice'); 
-            document.getElementById('invoiceVisits').value = '';
-            loadInvoices(); 
-            loadDashboard(); 
+                showAlert(`Invoice ${invNo} berhasil!`, 'success'); closeModal('modalInvoice'); document.getElementById('formInvoice').reset(); loadInvoices(); loadDashboard();
+            } catch (e) { showAlert('Gagal: ' + e.message, 'error'); }
         };
-        
-        async function loadInvoices() { 
-            document.getElementById('loadingInvoices').style.display='block'; 
-            const { data } = await supabase.from('invoices').select('*, clients(name)').order('invoice_date', {ascending: false}); 
-            document.getElementById('loadingInvoices').style.display='none'; 
-            document.getElementById('tableInvoicesContainer').style.display='block'; 
-            const tbody = document.getElementById('tbodyInvoices'); tbody.innerHTML = ''; 
-            (data||[]).forEach(i => { 
-                const badgeClass = i.status === 'PAID' ? 'badge-paid' : 'badge-pending';
-                const tgl = i.invoice_date ? new Date(i.invoice_date).toLocaleDateString('id-ID') : '-';
-                tbody.innerHTML += `<tr><td><strong>${i.invoice_number||'INV'}</strong></td><td>${i.clients?.name||'-'}</td><td>${tgl}</td><td>${formatRupiah(i.total_amount)}</td><td><span class="badge ${badgeClass}">${i.status}</span></td><td><button class="btn btn-sm btn-info" onclick="exportInvoicePDF('${i.id}')"><i class="fa-solid fa-file-pdf"></i> PDF</button></td></tr>`; 
-            }); 
+
+        async function loadInvoices() {
+            document.getElementById('loadingInvoices').style.display = 'block'; document.getElementById('tableInvoicesContainer').style.display = 'none';
+            try {
+                const { data, error } = await supabase.from('invoices').select('*, clients(name)').order('invoice_date', { ascending: false });
+                document.getElementById('loadingInvoices').style.display = 'none'; if (error) throw error;
+                document.getElementById('tableInvoicesContainer').style.display = 'block'; const tbody = document.getElementById('tbodyInvoices'); tbody.innerHTML = '';
+                if (!data || data.length === 0) { tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:40px;">Belum ada invoice.</td></tr>'; return; }
+                data.forEach(inv => { const sc = inv.status === 'PAID' ? 'badge-paid' : 'badge-pending'; const tr = document.createElement('tr'); tr.innerHTML = `<td><strong>${inv.invoice_number}</strong></td><td>${inv.clients?.name || '-'}</td><td>${new Date(inv.invoice_date).toLocaleDateString('id-ID')}</td><td><strong>${formatRupiah(inv.total_amount)}</strong></td><td><span class="badge ${sc}">${inv.status}</span></td><td>${inv.status !== 'PAID' ? `<button class="btn btn-sm btn-success" onclick="markPaid('${inv.id}')"><i class="fa-solid fa-check"></i> Lunas</button>` : ''}</td>`; tbody.appendChild(tr); });
+            } catch (e) { showAlert('Gagal: ' + e.message, 'error'); }
         }
 
-        async function loadExpenses() { 
-            document.getElementById('loadingExpenses').style.display='block'; 
-            const { data } = await supabase.from('expenses').select('*').order('expense_date', {ascending: false}); 
-            document.getElementById('loadingExpenses').style.display='none'; 
-            document.getElementById('tableExpensesContainer').style.display='block'; 
-            const tbody = document.getElementById('tbodyExpenses'); tbody.innerHTML = ''; 
-            (data||[]).forEach(e => { 
-                const tgl = e.expense_date ? new Date(e.expense_date).toLocaleDateString('id-ID') : '-';
-                tbody.innerHTML += `<tr><td>${tgl}</td><td>${e.account_code}</td><td>${e.description||'-'}</td><td>${formatRupiah(e.amount)}</td><td><button class="btn btn-sm btn-danger" onclick="deleteExpense('${e.id}')">Hapus</button></td></tr>`; 
-            }); 
+        window.markPaid = async function(id) { if (!confirm('Tandai LUNAS?')) return; try { const { error } = await supabase.from('invoices').update({ status: 'PAID', paid_date: new Date().toISOString().split('T')[0], payment_method: 'Transfer Bank' }).eq('id', id); if (error) throw error; showAlert('Invoice LUNAS!', 'success'); loadInvoices(); loadDashboard(); } catch (e) { showAlert('Gagal: ' + e.message, 'error'); } };
+
+        async function loadExpenses() {
+            document.getElementById('loadingExpenses').style.display = 'block'; document.getElementById('tableExpensesContainer').style.display = 'none';
+            try {
+                const { data, error } = await supabase.from('expenses').select('*').order('expense_date', { ascending: false });
+                document.getElementById('loadingExpenses').style.display = 'none'; if (error) throw error;
+                allExpenses = data || []; document.getElementById('tableExpensesContainer').style.display = 'block'; const tbody = document.getElementById('tbodyExpenses'); tbody.innerHTML = '';
+                if (allExpenses.length === 0) { tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:40px;">Belum ada pengeluaran.</td></tr>'; return; }
+                const cn = { '5-2010': 'Retribusi TPA/RDF', '5-2011': 'Vendor Pengolahan', '5-2002': 'BBM', '5-2001': 'Gaji', '5-2003': 'Maint. Kendaraan', '5-2004': 'Maint. Mesin', '5-2005': 'Listrik & Air', '5-2006': 'Perlengkapan', '5-3001': 'Admin Bank', '5-3002': 'Lain-lain' };
+                allExpenses.forEach(exp => { const tr = document.createElement('tr'); tr.innerHTML = `<td>${new Date(exp.expense_date).toLocaleDateString('id-ID')}</td><td><span class="badge badge-category">${cn[exp.account_code] || exp.account_code}</span></td><td>${exp.description}</td><td><strong>${formatRupiah(exp.amount)}</strong></td><td><button class="btn btn-sm btn-danger" onclick="deleteExpense('${exp.id}')"><i class="fa-solid fa-trash"></i></button></td>`; tbody.appendChild(tr); });
+            } catch (e) { showAlert('Gagal: ' + e.message, 'error'); }
         }
-        
-        window.saveExpense = async (e) => { 
-            e.preventDefault(); 
-            const { error } = await supabase.from('expenses').insert({ expense_date: document.getElementById('expenseDate').value, account_code: document.getElementById('expenseCategory').value, amount: parseFloat(document.getElementById('expenseAmount').value), description: document.getElementById('expenseDescription').value }); 
-            if(!error) { 
-                showAlert('Pengeluaran berhasil dicatat!'); 
-                closeModal('modalExpense'); 
-                document.getElementById('expenseAmount').value = '';
-                document.getElementById('expenseDescription').value = '';
-                loadExpenses(); 
-                loadDashboard(); 
-            } else { showAlert('Gagal: ' + error.message, 'error'); }
-        };
-        
-        window.deleteExpense = async (id) => { 
-            if(confirm('Yakin hapus data pengeluaran ini?')) { 
-                await supabase.from('expenses').delete().eq('id', id); 
-                loadExpenses(); 
-            } 
+
+        window.saveExpense = async function(e) {
+            e.preventDefault(); const d = document.getElementById('expenseDate').value; const ac = document.getElementById('expenseCategory').value; const desc = document.getElementById('expenseDescription').value; const amt = parseFloat(document.getElementById('expenseAmount').value); const pc = document.getElementById('expensePayment').value; const notes = document.getElementById('expenseNotes').value;
+            if (!ac) { showAlert('Pilih kategori!', 'error'); return; }
+            try {
+                const { data: exp, error: ee } = await supabase.from('expenses').insert({ expense_date: d, account_code: ac, description: desc, amount: amt, payment_account_code: pc, notes: notes, created_by: 'admin@raj.com' }).select().single();
+                if (ee) throw ee;
+                const jn = 'JV-EXP-' + d.replace(/-/g, '') + '-' + String(Math.floor(Math.random() * 1000)).padStart(3, '0');
+                const { data: ab } = await supabase.from('accounts').select('id').eq('code', ac).single(); const { data: ak } = await supabase.from('accounts').select('id').eq('code', pc).single();
+                if (ab && ak) {
+                    const { data: j } = await supabase.from('journal_entries').insert({ entry_number: jn, entry_date: d, reference_type: 'EXPENSE', reference_id: exp.id, description: `Pengeluaran: ${desc}`, status: 'POSTED', created_by: 'admin@raj.com' }).select().single();
+                    await supabase.from('journal_entry_lines').insert([ { journal_entry_id: j.id, account_id: ab.id, debit: amt, credit: 0, description: desc }, { journal_entry_id: j.id, account_id: ak.id, debit: 0, credit: amt, description: `Pembayaran` } ]);
+                }
+                showAlert(`Pengeluaran ${formatRupiah(amt)} dicatat!`, 'success'); closeModal('modalExpense'); document.getElementById('formExpense').reset(); loadExpenses(); loadDashboard();
+            } catch (e) { showAlert('Gagal: ' + e.message, 'error'); }
         };
 
-        async function loadAssets() { 
-            document.getElementById('loadingAssets').style.display='block'; 
-            const { data } = await supabase.from('assets').select('*').order('name'); 
-            document.getElementById('loadingAssets').style.display='none'; 
-            const container = document.getElementById('tableAssetsContainer');
-            container.innerHTML = '';
-            (data||[]).forEach(a => { 
-                container.innerHTML += `<div class="stat-card" style="margin-bottom:10px;"><h3>${a.name}</h3><div class="value">${formatRupiah(a.acquisition_cost)}</div><small style="color:rgba(255,255,255,0.5)">Umur: ${a.useful_life_years} Tahun</small></div>`; 
-            }); 
+        window.deleteExpense = async function(id) { if (!confirm('Yakin hapus?')) return; try { const { data: exp } = await supabase.from('expenses').select('id').eq('id', id).single(); if (exp) { const { data: j } = await supabase.from('journal_entries').select('id').eq('reference_type', 'EXPENSE').eq('reference_id', id).single(); if (j) { await supabase.from('journal_entry_lines').delete().eq('journal_entry_id', j.id); await supabase.from('journal_entries').delete().eq('id', j.id); } } const { error } = await supabase.from('expenses').delete().eq('id', id); if (error) throw error; showAlert('Pengeluaran dihapus.', 'success'); loadExpenses(); loadDashboard(); } catch (e) { showAlert('Gagal: ' + e.message, 'error'); } };
+
+        async function loadAssets() {
+            document.getElementById('loadingAssets').style.display = 'block'; document.getElementById('tableAssetsContainer').style.display = 'none';
+            try {
+                const { data, error } = await supabase.from('assets').select('*').eq('is_active', true).order('code');
+                document.getElementById('loadingAssets').style.display = 'none'; if (error) throw error;
+                allAssets = data || []; document.getElementById('tableAssetsContainer').style.display = 'block';
+                if (allAssets.length === 0) { document.getElementById('tableAssetsContainer').innerHTML = '<div style="text-align:center;padding:40px;color:rgba(255,255,255,0.5);"><i class="fa-solid fa-truck" style="font-size:60px;opacity:0.3;margin-bottom:15px;"></i><p>Belum ada aset.</p></div>'; return; }
+                let html = ''; const ci = { 'KENDARAAN': 'fa-truck', 'MESIN': 'fa-gears', 'GEDUNG': 'fa-building' }; const cc = { 'KENDARAAN': '#4ade80', 'MESIN': '#3b82f6', 'GEDUNG': '#a855f7' };
+                allAssets.forEach(a => { const bv = a.acquisition_cost - (a.accumulated_depreciation || 0); const md = (a.acquisition_cost - a.salvage_value) / (a.useful_life_years * 12); html += `<div class="asset-card"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:15px;"><h4 style="color:${cc[a.category] || '#4ade80'};"><i class="fa-solid ${ci[a.category] || 'fa-box'}"></i> ${a.name}</h4><div><span class="badge badge-asset">${a.category}</span><button class="btn btn-sm btn-danger" onclick="deleteAsset('${a.id}')" style="margin-left:10px;"><i class="fa-solid fa-trash"></i></button></div></div><div class="asset-info"><div><strong>Kode</strong>${a.code}</div><div><strong>Divisi</strong>${a.division || '-'}</div><div><strong>Tgl Perolehan</strong>${new Date(a.acquisition_date).toLocaleDateString('id-ID')}</div><div><strong>Umur</strong>${a.useful_life_years} thn</div><div><strong>Harga</strong>${formatRupiah(a.acquisition_cost)}</div><div><strong>Acc. Depresiasi</strong>${formatRupiah(a.accumulated_depreciation || 0)}</div><div><strong>Nilai Buku</strong>${formatRupiah(bv)}</div><div><strong>Depresiasi/Bln</strong>${formatRupiah(md)}</div></div></div>`; });
+                document.getElementById('tableAssetsContainer').innerHTML = html;
+            } catch (e) { showAlert('Gagal: ' + e.message, 'error'); }
         }
-        
-        window.saveAsset = async (e) => { 
-            e.preventDefault(); 
-            const { error } = await supabase.from('assets').insert({ name: document.getElementById('assetName').value, acquisition_cost: parseFloat(document.getElementById('assetCost').value), useful_life_years: parseInt(document.getElementById('assetLife').value) }); 
-            if(!error) { 
-                showAlert('Aset berhasil disimpan!'); 
-                closeModal('modalAsset'); 
-                document.getElementById('assetName').value = '';
-                loadAssets(); 
-            } else { showAlert('Gagal: ' + error.message, 'error'); }
-        };
-        
-        window.calculateDepreciation = () => { 
-            showAlert('Fitur penyusutan otomatis akan dijurnal pada akhir periode.', 'info'); 
+
+        window.saveAsset = async function(e) {
+            e.preventDefault();
+            const data = { code: document.getElementById('assetCode').value, name: document.getElementById('assetName').value, category: document.getElementById('assetCategory').value, division: document.getElementById('assetDivision').value, acquisition_date: document.getElementById('assetAcquisitionDate').value, acquisition_cost: parseFloat(document.getElementById('assetCost').value), useful_life_years: parseInt(document.getElementById('assetLife').value), salvage_value: parseFloat(document.getElementById('assetSalvage').value) || 0, accumulated_depreciation: 0, current_book_value: parseFloat(document.getElementById('assetCost').value), next_maintenance_date: document.getElementById('assetNextMaintenance').value || null, maintenance_notes: document.getElementById('assetNotes').value, is_active: true };
+            try { const { error } = await supabase.from('assets').insert(data); if (error) throw error; showAlert('Aset ditambahkan!', 'success'); closeModal('modalAsset'); document.getElementById('formAsset').reset(); loadAssets(); } catch (e) { showAlert('Gagal: ' + e.message, 'error'); }
         };
 
-        async function loadInventory() { 
-            document.getElementById('loadingInventory').style.display='block'; 
-            const { data } = await supabase.from('products').select('*').order('name'); 
-            document.getElementById('loadingInventory').style.display='none'; 
-            allProducts = data||[]; 
-            document.getElementById('statProducts').textContent = allProducts.length; 
-            
-            const totalVal = allProducts.reduce((sum, p) => sum + ((p.stock_on_hand||0) * (p.selling_price||0)), 0);
-            document.getElementById('statInventoryValue').textContent = formatRupiah(totalVal);
+        window.deleteAsset = async function(id) { if (!confirm('Yakin hapus?')) return; try { const { error } = await supabase.from('assets').update({ is_active: false }).eq('id', id); if (error) throw error; showAlert('Aset dihapus.', 'success'); loadAssets(); } catch (e) { showAlert('Gagal: ' + e.message, 'error'); } };
 
-            const container = document.getElementById('inventoryContainer');
-            container.innerHTML = '';
+        window.calculateDepreciation = async function() {
+            if (!confirm('Hitung penyusutan bulanan?')) return;
+            showAlert('Menghitung...', 'info');
+            try {
+                const { data: assets } = await supabase.from('assets').select('*').eq('is_active', true);
+                if (!assets || assets.length === 0) { showAlert('Tidak ada aset aktif.', 'error'); return; }
+                const today = new Date(); const jn = 'JV-DEP-' + today.getFullYear() + String(today.getMonth() + 1).padStart(2, '0') + '-' + String(Math.floor(Math.random() * 1000)).padStart(3, '0');
+                let total = 0; const lines = [];
+                for (const a of assets) {
+                    const md = (a.acquisition_cost - a.salvage_value) / (a.useful_life_years * 12);
+                    const na = (a.accumulated_depreciation || 0) + md; const nb = a.acquisition_cost - na;
+                    await supabase.from('assets').update({ accumulated_depreciation: na, current_book_value: nb, last_depreciation_date: today.toISOString().split('T')[0] }).eq('id', a.id);
+                    total += md;
+                    let ec = '5-2007', ac = '1-4004';
+                    if (a.category === 'MESIN') { ec = '5-2008'; ac = '1-4005'; }
+                    if (a.category === 'GEDUNG') { ec = '5-2009'; ac = '1-4006'; }
+                    const { data: ab } = await supabase.from('accounts').select('id').eq('code', ec).single(); const { data: aa } = await supabase.from('accounts').select('id').eq('code', ac).single();
+                    if (ab && aa) lines.push({ account_id: ab.id, debit: md, credit: 0, description: `Penyusutan ${a.name}` }, { account_id: aa.id, debit: 0, credit: md, description: `Acc. Penyusutan ${a.name}` });
+                }
+                if (lines.length > 0) {
+                    const { data: j } = await supabase.from('journal_entries').insert({ entry_number: jn, entry_date: today.toISOString().split('T')[0], reference_type: 'DEPRECIATION', description: `Penyusutan ${today.toLocaleDateString('id-ID', { month: 'long', year: 'numeric' })}`, status: 'POSTED', created_by: 'admin@raj.com' }).select().single();
+                    if (j) await supabase.from('journal_entry_lines').insert(lines.map(l => ({ ...l, journal_entry_id: j.id })));
+                }
+                showAlert(`Penyusutan ${formatRupiah(total)} dicatat!`, 'success'); loadAssets(); loadDashboard();
+            } catch (e) { showAlert('Gagal: ' + e.message, 'error'); }
+        };
+
+        async function loadCategoriesDropdown() {
+            const { data } = await supabase.from('product_categories').select('*').eq('is_active', true).order('name');
+            allCategories = data || [];
+            const select = document.getElementById('productCategory');
+            select.innerHTML = '<option value="">-- Pilih Kategori --</option>';
+            allCategories.forEach(c => { select.innerHTML += `<option value="${c.name}" data-stock="${c.default_account_stock || ''}" data-cogs="${c.default_account_cogs || ''}">${c.name}</option>`; });
+        }
+
+        window.autoFillAccounts = function() {
+            const select = document.getElementById('productCategory');
+            const opt = select.options[select.selectedIndex];
+            if (opt.dataset.stock) document.getElementById('productAccountStock').value = opt.dataset.stock;
+            if (opt.dataset.cogs) document.getElementById('productAccountCogs').value = opt.dataset.cogs;
+        };
+
+        window.saveCategory = async function(e) {
+            e.preventDefault();
+            const data = { name: document.getElementById('categoryName').value, description: document.getElementById('categoryDesc').value, default_account_stock: document.getElementById('categoryAccountStock').value, default_account_cogs: document.getElementById('categoryAccountCogs').value, is_active: true };
+            try { const { error } = await supabase.from('product_categories').insert(data); if (error) throw error; showAlert('Kategori berhasil ditambahkan!', 'success'); closeModal('modalCategory'); document.getElementById('formCategory').reset(); loadCategoriesDropdown(); } catch (e) { showAlert('Gagal: ' + e.message, 'error'); }
+        };
+
+        async function loadInventory() {
+            document.getElementById('loadingInventory').style.display = 'block'; document.getElementById('inventoryContainer').style.display = 'none';
+            try {
+                const { data, error } = await supabase.from('products').select('*').eq('is_active', true).order('code');
+                document.getElementById('loadingInventory').style.display = 'none'; if (error) throw error;
+                allProducts = data || [];
+                const totalProducts = allProducts.length;
+                const lowStock = allProducts.filter(p => p.stock_on_hand <= p.min_stock).length;
+                const totalValue = allProducts.reduce((s, p) => s + (p.stock_on_hand * p.current_avg_cost), 0);
+                document.getElementById('statProducts').textContent = totalProducts;
+                document.getElementById('statLowStock').textContent = lowStock;
+                document.getElementById('statInventoryValue').textContent = formatRupiah(totalValue);
+                document.getElementById('inventoryContainer').style.display = 'block';
+                if (allProducts.length === 0) { document.getElementById('inventoryContainer').innerHTML = '<div style="text-align:center;padding:40px;color:rgba(255,255,255,0.5);"><i class="fa-solid fa-boxes-stacked" style="font-size:60px;opacity:0.3;margin-bottom:15px;"></i><p>Belum ada produk. Klik "Produk Baru" untuk memulai.</p></div>'; return; }
+                let html = '';
+                allProducts.forEach(p => {
+                    const isLow = p.stock_on_hand <= p.min_stock;
+                    const value = p.stock_on_hand * p.current_avg_cost;
+                    html += `<div class="product-card ${isLow ? 'low-stock' : ''}"><div class="product-header"><div><h4><i class="fa-solid fa-box" style="color:#4ade80;"></i> ${p.name}</h4><div class="code">${p.code} • ${p.category} • ${p.division}</div></div><div>${isLow ? '<span class="badge badge-low"><i class="fa-solid fa-triangle-exclamation"></i> Stok Menipis</span>' : '<span class="badge badge-paid">Stok Aman</span>'}<button class="btn btn-sm btn-danger" onclick="deleteProduct('${p.id}')" style="margin-left:10px;"><i class="fa-solid fa-trash"></i></button></div></div><div class="product-stats"><div class="product-stat"><strong>Stok Saat Ini</strong><div class="val">${p.stock_on_hand} ${p.unit}</div></div><div class="product-stat"><strong>Harga Pokok</strong><div class="val">${formatRupiah(p.current_avg_cost)}</div></div><div class="product-stat"><strong>Harga Jual</strong><div class="val">${formatRupiah(p.selling_price)}</div></div><div class="product-stat"><strong>Nilai Stok</strong><div class="val">${formatRupiah(value)}</div></div><div class="product-stat"><strong>Stok Min.</strong><div class="val">${p.min_stock} ${p.unit}</div></div></div><div class="product-actions"><button class="btn btn-sm btn-info" onclick="quickStockIn('${p.id}')"><i class="fa-solid fa-arrow-down"></i> Stok Masuk</button><button class="btn btn-sm btn-warning" onclick="quickStockOut('${p.id}')"><i class="fa-solid fa-arrow-up"></i> Stok Keluar</button></div></div>`;
+                });
+                document.getElementById('inventoryContainer').innerHTML = html;
+            } catch (e) { showAlert('Gagal: ' + e.message, 'error'); }
+        }
+
+        function populateProductSelect(selectId) { 
+            const s = document.getElementById(selectId); 
+            s.innerHTML = '<option value="">-- Pilih Produk --</option>'; 
             allProducts.forEach(p => { 
-                container.innerHTML += `<div class="stat-card" style="margin-bottom:10px;"><h3>${p.name}</h3><div class="value">Stok: ${p.stock_on_hand||0}</div><small style="color:rgba(255,255,255,0.5)">Min: ${p.min_stock||0} | Jual: ${formatRupiah(p.selling_price)}</small></div>`; 
+                s.innerHTML += '<option value="' + p.id + '">' + p.name + ' (Stok: ' + p.stock_on_hand + ' ' + p.unit + ')</option>'; 
             }); 
         }
-        
-        function populateProductSelect(id) { 
-            const s = document.getElementById(id); 
-            s.innerHTML = '<option value="">Pilih Produk</option>'; 
-            allProducts.forEach(p => { 
-                s.innerHTML += '<option value="' + p.id + '">' + p.name + '</option>'; 
-            }); 
+
+        window.saveProduct = async function(e) {
+            e.preventDefault();
+            const data = { code: document.getElementById('productCode').value, name: document.getElementById('productName').value, category: document.getElementById('productCategory').value, division: document.getElementById('productDivision').value, unit: document.getElementById('productUnit').value, selling_price: parseFloat(document.getElementById('productSellingPrice').value) || 0, min_stock: parseFloat(document.getElementById('productMinStock').value) || 0, current_avg_cost: 0, stock_on_hand: 0, account_stock: document.getElementById('productAccountStock').value, account_cogs: document.getElementById('productAccountCogs').value, is_active: true };
+            try { const { error } = await supabase.from('products').insert(data); if (error) throw error; showAlert('Produk ditambahkan!', 'success'); closeModal('modalProduct'); document.getElementById('formProduct').reset(); loadInventory(); } catch (e) { showAlert('Gagal: ' + e.message, 'error'); }
+        };
+
+        window.deleteProduct = async function(id) { if (!confirm('Yakin hapus produk?')) return; try { const { error } = await supabase.from('products').update({ is_active: false }).eq('id', id); if (error) throw error; showAlert('Produk dihapus.', 'success'); loadInventory(); } catch (e) { showAlert('Gagal: ' + e.message, 'error'); } };
+
+        window.quickStockIn = function(productId) { openModal('modalStockIn'); setTimeout(() => { document.getElementById('stockInProduct').value = productId; }, 100); };
+        window.quickStockOut = function(productId) { openModal('modalStockOut'); setTimeout(() => { document.getElementById('stockOutProduct').value = productId; }, 100); };
+
+        window.saveStockIn = async function(e) {
+            e.preventDefault();
+            const date = document.getElementById('stockInDate').value; const productId = document.getElementById('stockInProduct').value; const qty = parseFloat(document.getElementById('stockInQty').value); const cost = parseFloat(document.getElementById('stockInCost').value); const source = document.getElementById('stockInSource').value; const notes = document.getElementById('stockInNotes').value;
+            const product = allProducts.find(p => p.id === productId);
+            if (!product) { showAlert('Produk tidak ditemukan!', 'error'); return; }
+            try {
+                const totalValueOld = product.stock_on_hand * product.current_avg_cost; const totalValueNew = qty * cost; const newStock = product.stock_on_hand + qty; const newAvgCost = (totalValueOld + totalValueNew) / newStock;
+                await supabase.from('products').update({ stock_on_hand: newStock, current_avg_cost: newAvgCost }).eq('id', productId);
+                await supabase.from('inventory_movements').insert({ product_id: productId, movement_type: 'IN', quantity: qty, unit_cost: cost, total_cost: qty * cost, reference_type: source, movement_date: date, notes: notes, created_by: 'admin@raj.com' });
+                if (source === 'PURCHASE') {
+                    const jn = 'JV-STKIN-' + date.replace(/-/g, '') + '-' + String(Math.floor(Math.random() * 1000)).padStart(3, '0');
+                    const { data: akStock } = await supabase.from('accounts').select('id').eq('code', product.account_stock).single(); const { data: akCash } = await supabase.from('accounts').select('id').eq('code', '1-1001').single();
+                    if (akStock && akCash) {
+                        const { data: j } = await supabase.from('journal_entries').insert({ entry_number: jn, entry_date: date, reference_type: 'STOCK_IN', description: `Stok Masuk: ${product.name} (${qty} ${product.unit})`, status: 'POSTED', created_by: 'admin@raj.com' }).select().single();
+                        if (j) await supabase.from('journal_entry_lines').insert([ { journal_entry_id: j.id, account_id: akStock.id, debit: qty * cost, credit: 0, description: `Persediaan ${product.name}` }, { journal_entry_id: j.id, account_id: akCash.id, debit: 0, credit: qty * cost, description: `Pembelian ${product.name}` } ]);
+                    }
+                }
+                showAlert(`Stok masuk ${qty} ${product.unit} berhasil!`, 'success'); closeModal('modalStockIn'); document.getElementById('formStockIn').reset(); loadInventory();
+            } catch (e) { showAlert('Gagal: ' + e.message, 'error'); }
+        };
+
+        window.saveStockOut = async function(e) {
+            e.preventDefault();
+            const date = document.getElementById('stockOutDate').value; const productId = document.getElementById('stockOutProduct').value; const qty = parseFloat(document.getElementById('stockOutQty').value); const price = parseFloat(document.getElementById('stockOutPrice').value) || 0; const dest = document.getElementById('stockOutDestination').value; const notes = document.getElementById('stockOutNotes').value;
+            const product = allProducts.find(p => p.id === productId);
+            if (!product) { showAlert('Produk tidak ditemukan!', 'error'); return; }
+            if (qty > product.stock_on_hand) { showAlert(`Stok tidak cukup! Stok saat ini: ${product.stock_on_hand} ${product.unit}`, 'error'); return; }
+            try {
+                const hpp = product.current_avg_cost; const newStock = product.stock_on_hand - qty;
+                await supabase.from('products').update({ stock_on_hand: newStock }).eq('id', productId);
+                await supabase.from('inventory_movements').insert({ product_id: productId, movement_type: 'OUT', quantity: qty, unit_cost: hpp, total_cost: qty * hpp, reference_type: dest, movement_date: date, notes: notes, created_by: 'admin@raj.com' });
+                const jn = 'JV-STKOUT-' + date.replace(/-/g, '') + '-' + String(Math.floor(Math.random() * 1000)).padStart(3, '0');
+                const { data: akCogs } = await supabase.from('accounts').select('id').eq('code', product.account_cogs).single(); const { data: akStock } = await supabase.from('accounts').select('id').eq('code', product.account_stock).single();
+                if (akCogs && akStock) {
+                    const { data: j } = await supabase.from('journal_entries').insert({ entry_number: jn, entry_date: date, reference_type: 'STOCK_OUT', description: `Stok Keluar: ${product.name} (${qty} ${product.unit})`, status: 'POSTED', created_by: 'admin@raj.com' }).select().single();
+                    if (j) await supabase.from('journal_entry_lines').insert([ { journal_entry_id: j.id, account_id: akCogs.id, debit: qty * hpp, credit: 0, description: `HPP ${product.name}` }, { journal_entry_id: j.id, account_id: akStock.id, debit: 0, credit: qty * hpp, description: `Persediaan ${product.name}` } ]);
+                }
+                showAlert(`Stok keluar ${qty} ${product.unit} berhasil! HPP: ${formatRupiah(qty * hpp)}`, 'success'); closeModal('modalStockOut'); document.getElementById('formStockOut').reset(); loadInventory(); loadDashboard();
+            } catch (e) { showAlert('Gagal: ' + e.message, 'error'); }
+        };
+
+        async function loadProduction() {
+            document.getElementById('loadingProduction').style.display = 'block'; document.getElementById('productionContainer').style.display = 'none';
+            try {
+                const { data: productions, error: pErr } = await supabase.from('productions').select('*').order('production_date', { ascending: false });
+                if (pErr) throw pErr;
+                const { data: inputs } = await supabase.from('production_inputs').select('*');
+                const { data: outputs } = await supabase.from('production_outputs').select('*, products(name, code, unit)');
+                document.getElementById('loadingProduction').style.display = 'none';
+                const activeCount = productions ? productions.filter(p => p.status === 'IN_PROGRESS').length : 0;
+                const completedCount = productions ? productions.filter(p => p.status === 'COMPLETED').length : 0;
+                const totalInput = inputs ? inputs.reduce((s, i) => s + (i.quantity || 0), 0) : 0;
+                const totalOutput = outputs ? outputs.reduce((s, o) => s + (o.quantity || 0), 0) : 0;
+                document.getElementById('statActiveProduction').textContent = activeCount;
+                document.getElementById('statCompletedProduction').textContent = completedCount;
+                document.getElementById('statTotalInput').textContent = totalInput.toLocaleString('id-ID') + ' kg';
+                document.getElementById('statTotalOutput').textContent = totalOutput.toLocaleString('id-ID') + ' kg';
+                document.getElementById('productionContainer').style.display = 'block';
+                if (!productions || productions.length === 0) { document.getElementById('productionContainer').innerHTML = '<div style="text-align:center;padding:40px;color:rgba(255,255,255,0.5);"><i class="fa-solid fa-flask" style="font-size:60px;opacity:0.3;margin-bottom:15px;"></i><p>Belum ada produksi. Klik "Produksi Baru" untuk memulai.</p></div>'; return; }
+                let html = '';
+                productions.forEach(p => {
+                    const pInputs = (inputs || []).filter(i => i.production_id === p.id);
+                    const pOutputs = (outputs || []).filter(o => o.production_id === p.id);
+                    const statusClass = p.status === 'COMPLETED' ? 'completed' : 'in-progress';
+                    const statusBadge = p.status === 'COMPLETED' ? '<span class="badge badge-completed">Selesai</span>' : '<span class="badge badge-progress">Dalam Proses</span>';
+                    html += `<div class="production-card ${statusClass}"><div class="production-header"><div><h4><i class="fa-solid fa-flask"></i> ${p.batch_name || p.production_number}</h4><div class="code">${p.production_number} • ${new Date(p.production_date).toLocaleDateString('id-ID')} • ${statusBadge}</div></div><div>${p.status === 'IN_PROGRESS' ? `<button class="btn btn-sm btn-success" onclick="completeProduction('${p.id}')"><i class="fa-solid fa-check"></i> Selesaikan</button>` : ''}<button class="btn btn-sm btn-danger" onclick="deleteProduction('${p.id}')" style="margin-left:5px;"><i class="fa-solid fa-trash"></i></button></div></div><div class="production-stats"><div class="production-stat"><strong><i class="fa-solid fa-arrow-down" style="color:#06b6d4;"></i> Bahan Baku</strong><div class="val">${pInputs.reduce((s, i) => s + (i.quantity || 0), 0).toLocaleString('id-ID')} kg</div><small style="color:rgba(255,255,255,0.6);">${pInputs.length} item</small></div><div class="production-stat"><strong><i class="fa-solid fa-arrow-up" style="color:#10b981;"></i> Produk Output</strong><div class="val">${pOutputs.reduce((s, o) => s + (o.quantity || 0), 0).toLocaleString('id-ID')} ${pOutputs[0]?.unit || 'kg'}</div><small style="color:rgba(255,255,255,0.6);">${pOutputs.length} produk</small></div><div class="production-stat"><strong><i class="fa-solid fa-calendar"></i> Periode</strong><div class="val" style="font-size:13px;">${p.start_date ? new Date(p.start_date).toLocaleDateString('id-ID') : '-'} → ${p.end_date ? new Date(p.end_date).toLocaleDateString('id-ID') : '...'}</div></div></div>${pOutputs.length > 0 ? `<div style="margin-top:15px; padding-top:15px; border-top:1px solid rgba(255,255,255,0.1);"><strong style="color:#10b981; font-size:12px; text-transform:uppercase;">Hasil Produksi:</strong><div style="margin-top:8px; display:flex; flex-wrap:wrap; gap:8px;">${pOutputs.map(o => `<span class="badge badge-paid">${o.products?.name || 'Produk'}: ${o.quantity} ${o.unit}</span>`).join('')}</div></div>` : ''}${p.notes ? `<div style="margin-top:10px; font-size:12px; color:rgba(255,255,255,0.6);"><i class="fa-solid fa-note-sticky"></i> ${p.notes}</div>` : ''}</div>`;
+                });
+                document.getElementById('productionContainer').innerHTML = html;
+            } catch (e) { showAlert('Gagal: ' + e.message, 'error'); }
         }
-        
-        window.saveProduct = async (e) => { 
-            e.preventDefault(); 
-            const { error } = await supabase.from('products').insert({ name: document.getElementById('productName').value, selling_price: parseFloat(document.getElementById('productSellingPrice').value)||0, min_stock: parseFloat(document.getElementById('productMinStock').value)||0, stock_on_hand: 0 }); 
-            if(!error) { 
-                showAlert('Produk berhasil ditambahkan!'); 
-                closeModal('modalProduct'); 
-                document.getElementById('productName').value = '';
-                loadInventory(); 
-            } else { showAlert('Gagal: ' + error.message, 'error'); }
+
+        window.saveProduction = async function(e) {
+            e.preventDefault();
+            if (productionInputs.length === 0) { showAlert('Tambahkan minimal 1 bahan baku!', 'error'); return; }
+            if (productionOutputs.length === 0) { showAlert('Tambahkan minimal 1 produk output!', 'error'); return; }
+            const productionNumber = document.getElementById('productionNumber').value; const batchName = document.getElementById('productionBatch').value; const startDate = document.getElementById('productionStartDate').value; const endDate = document.getElementById('productionEndDate').value; const notes = document.getElementById('productionNotes').value;
+            try {
+                const { data: production, error: pErr } = await supabase.from('productions').insert({ production_number: productionNumber, production_date: startDate, start_date: startDate, end_date: endDate || null, status: endDate ? 'COMPLETED' : 'IN_PROGRESS', batch_name: batchName, notes: notes, created_by: 'admin@raj.com' }).select().single();
+                if (pErr) throw pErr;
+                const inputsData = productionInputs.map(i => ({ production_id: production.id, waste_collection_id: i.waste_collection_id || null, material_type: i.material_type, quantity: i.quantity, unit: i.unit }));
+                await supabase.from('production_inputs').insert(inputsData);
+                let totalProductionCost = 0; const outputsData = [];
+                for (const o of productionOutputs) {
+                    const product = allProducts.find(p => p.id === o.product_id); if (!product) continue;
+                    const totalInputQty = productionInputs.reduce((s, i) => s + i.quantity, 0);
+                    const productionCostPerUnit = totalInputQty > 0 ? (product.current_avg_cost || 0) : 0;
+                    outputsData.push({ production_id: production.id, product_id: o.product_id, quantity: o.quantity, unit: o.unit, production_cost: productionCostPerUnit });
+                    const totalValueOld = product.stock_on_hand * product.current_avg_cost; const totalValueNew = o.quantity * productionCostPerUnit; const newStock = product.stock_on_hand + o.quantity; const newAvgCost = newStock > 0 ? (totalValueOld + totalValueNew) / newStock : productionCostPerUnit;
+                    await supabase.from('products').update({ stock_on_hand: newStock, current_avg_cost: newAvgCost }).eq('id', o.product_id);
+                    totalProductionCost += o.quantity * productionCostPerUnit;
+                }
+                await supabase.from('production_outputs').insert(outputsData);
+                if (totalProductionCost > 0) {
+                    const jn = 'JV-PRD-' + startDate.replace(/-/g, '') + '-' + String(Math.floor(Math.random() * 1000)).padStart(3, '0');
+                    const firstOutput = productionOutputs[0]; const firstProduct = allProducts.find(p => p.id === firstOutput.product_id);
+                    if (firstProduct) {
+                        const { data: akStock } = await supabase.from('accounts').select('id').eq('code', firstProduct.account_stock).single(); const { data: akWip } = await supabase.from('accounts').select('id').eq('code', '1-3003').single();
+                        if (akStock && akWip) {
+                            const { data: j } = await supabase.from('journal_entries').insert({ entry_number: jn, entry_date: startDate, reference_type: 'PRODUCTION', reference_id: production.id, description: `Produksi ${batchName || productionNumber}`, status: 'POSTED', created_by: 'admin@raj.com' }).select().single();
+                            if (j) await supabase.from('journal_entry_lines').insert([ { journal_entry_id: j.id, account_id: akStock.id, debit: totalProductionCost, credit: 0, description: `Persediaan Output ${batchName}` }, { journal_entry_id: j.id, account_id: akWip.id, debit: 0, credit: totalProductionCost, description: `Bahan Baku Produksi` } ]);
+                        }
+                    }
+                }
+                showAlert(`Produksi ${productionNumber} berhasil! Stok output otomatis ditambahkan.`, 'success'); closeModal('modalProduction'); loadProduction(); loadInventory();
+            } catch (e) { showAlert('Gagal: ' + e.message, 'error'); }
         };
-        
-        window.saveStockIn = async (e) => { 
-            e.preventDefault(); 
-            const pid = document.getElementById('stockInProduct').value; 
-            const qty = parseFloat(document.getElementById('stockInQty').value); 
-            const cost = parseFloat(document.getElementById('stockInCost').value); 
-            const p = allProducts.find(x => x.id === pid); 
-            if(!p) return;
-            
-            const newStock = (p.stock_on_hand || 0) + qty; 
-            const newAvg = (((p.stock_on_hand||0) * (p.current_avg_cost||0)) + (qty * cost)) / newStock; 
-            
-            await supabase.from('products').update({ stock_on_hand: newStock, current_avg_cost: newAvg }).eq('id', pid); 
-            showAlert('Stok masuk berhasil dicatat!'); 
-            closeModal('modalStockIn'); 
-            document.getElementById('stockInQty').value = '';
-            document.getElementById('stockInCost').value = '';
-            loadInventory(); 
+
+        window.completeProduction = async function(id) {
+            if (!confirm('Tandai produksi ini sebagai SELESAI?')) return;
+            try { const { error } = await supabase.from('productions').update({ status: 'COMPLETED', end_date: new Date().toISOString().split('T')[0] }).eq('id', id); if (error) throw error; showAlert('Produksi diselesaikan!', 'success'); loadProduction(); } catch (e) { showAlert('Gagal: ' + e.message, 'error'); }
         };
-        
-        window.saveStockOut = async (e) => { 
-            e.preventDefault(); 
-            const pid = document.getElementById('stockOutProduct').value; 
-            const qty = parseFloat(document.getElementById('stockOutQty').value); 
-            const p = allProducts.find(x => x.id === pid); 
-            if(!p) return;
-            
-            if(qty > (p.stock_on_hand || 0)) {
-                showAlert('Stok tidak mencukupi!', 'error');
-                return;
-            }
-            
-            await supabase.from('products').update({ stock_on_hand: (p.stock_on_hand || 0) - qty }).eq('id', pid); 
-            showAlert('Stok keluar berhasil dicatat!'); 
-            closeModal('modalStockOut'); 
-            document.getElementById('stockOutQty').value = '';
-            loadInventory(); 
+
+        window.deleteProduction = async function(id) {
+            if (!confirm('Yakin hapus produksi ini? Data input/output juga akan terhapus.')) return;
+            try { await supabase.from('production_outputs').delete().eq('production_id', id); await supabase.from('production_inputs').delete().eq('production_id', id); const { error } = await supabase.from('productions').delete().eq('id', id); if (error) throw error; showAlert('Produksi dihapus.', 'success'); loadProduction(); } catch (e) { showAlert('Gagal: ' + e.message, 'error'); }
         };
-        
-        async function loadProduction() { 
-            document.getElementById('loadingProduction').style.display='block'; 
-            document.getElementById('loadingProduction').style.display='none'; 
-            document.getElementById('productionContainer').innerHTML = '<p style="color:#aaa; text-align:center; padding: 20px;"><i class="fa-solid fa-flask" style="font-size:40px; margin-bottom:15px; display:block;"></i>Modul produksi siap digunakan untuk konversi sampah menjadi pupuk/maggot.</p>'; 
+
+        async function loadReports() {
+            document.getElementById('loadingReports').style.display = 'block'; document.getElementById('reportContent').style.display = 'none';
+            try {
+                const { data: accounts, error: ae } = await supabase.from('accounts').select('*').order('code'); if (ae) throw ae;
+                const { data: lines, error: le } = await supabase.from('journal_entry_lines').select('*'); if (le) throw le;
+                let tR = 0, tE = 0, tA = 0, tL = 0, tEq = 0;
+                let rHTML = '<div class="report-section-title"><i class="fa-solid fa-arrow-trend-up"></i> PENDAPATAN</div><table><thead><tr><th>Kode</th><th>Nama</th><th style="text-align:right;">Jumlah</th></tr></thead><tbody>';
+                let eHTML = '<div class="report-section-title expense-title"><i class="fa-solid fa-arrow-trend-down"></i> BEBAN</div><table><thead><tr><th>Kode</th><th>Nama</th><th style="text-align:right;">Jumlah</th></tr></thead><tbody>';
+                let aHTML = '<div class="report-section-title asset-title"><i class="fa-solid fa-vault"></i> ASET</div><table><thead><tr><th>Kode</th><th>Nama</th><th style="text-align:right;">Jumlah</th></tr></thead><tbody>';
+                let lHTML = '<div class="report-section-title liability-title"><i class="fa-solid fa-hand-holding-dollar"></i> LIABILITAS</div><table><thead><tr><th>Kode</th><th>Nama</th><th style="text-align:right;">Jumlah</th></tr></thead><tbody>';
+                let eqHTML = '<div class="report-section-title equity-title"><i class="fa-solid fa-scale-balanced"></i> EKUITAS</div><table><thead><tr><th>Kode</th><th>Nama</th><th style="text-align:right;">Jumlah</th></tr></thead><tbody>';
+                accounts.forEach(a => {
+                    let bal = 0; lines.filter(l => l.account_id === a.id).forEach(l => { if (a.type === 'REVENUE') bal += (l.credit - l.debit); if (a.type === 'EXPENSE') bal += (l.debit - l.credit); if (a.type === 'ASSET') bal += (l.debit - l.credit); if (a.type === 'LIABILITY') bal += (l.credit - l.debit); if (a.type === 'EQUITY') bal += (l.credit - l.debit); });
+                    if (a.type === 'REVENUE' && bal > 0) { tR += bal; rHTML += `<tr><td>${a.code}</td><td>${a.name}</td><td style="text-align:right;"><strong>${formatRupiah(bal)}</strong></td></tr>`; }
+                    if (a.type === 'EXPENSE' && bal > 0) { tE += bal; eHTML += `<tr><td>${a.code}</td><td>${a.name}</td><td style="text-align:right;"><strong>${formatRupiah(bal)}</strong></td></tr>`; }
+                    if (a.type === 'ASSET' && bal !== 0) { tA += bal; aHTML += `<tr><td>${a.code}</td><td>${a.name}</td><td style="text-align:right;"><strong>${formatRupiah(bal)}</strong></td></tr>`; }
+                    if (a.type === 'LIABILITY' && bal !== 0) { tL += bal; lHTML += `<tr><td>${a.code}</td><td>${a.name}</td><td style="text-align:right;"><strong>${formatRupiah(bal)}</strong></td></tr>`; }
+                    if (a.type === 'EQUITY' && bal !== 0) { tEq += bal; eqHTML += `<tr><td>${a.code}</td><td>${a.name}</td><td style="text-align:right;"><strong>${formatRupiah(bal)}</strong></td></tr>`; }
+                });
+                currentLabaBersih = tR - tE; tEq += currentLabaBersih;
+                rHTML += '</tbody></table>'; eHTML += '</tbody></table>'; aHTML += '</tbody></table>'; lHTML += '</tbody></table>'; eqHTML += '</tbody></table>';
+                const isP = currentLabaBersih >= 0;
+                document.getElementById('reportRevenue').innerHTML = rHTML; document.getElementById('reportExpense').innerHTML = eHTML;
+                document.getElementById('reportSummary').innerHTML = `<div class="report-summary ${isP ? '' : 'loss'}"><div><h4>${isP ? 'LABA BERSIH' : 'RUGI BERSIH'}</h4><small>(Pendapatan - Beban)</small></div><div class="total" style="color:${isP ? '#4ade80' : '#ef4444'};">${formatRupiah(currentLabaBersih)}</div></div>`;
+                document.getElementById('reportAssets').innerHTML = aHTML; document.getElementById('reportLiabilities').innerHTML = lHTML;
+                document.getElementById('reportEquity').innerHTML = eqHTML + `<div class="report-summary" style="margin-top:10px;"><div><h4>Laba Bersih Berjalan</h4></div><div class="total" style="font-size:20px;color:#4ade80;">${formatRupiah(currentLabaBersih)}</div></div>`;
+                const isBalance = Math.abs(tA - (tL + tEq)) < 100;
+                document.getElementById('reportNeracaSummary').innerHTML = `<div class="report-summary ${isBalance ? '' : 'loss'}" style="margin-top:30px;"><div><h4>STATUS NERACA</h4><small>Total Aset: ${formatRupiah(tA)} | Liabilitas + Ekuitas: ${formatRupiah(tL + tEq)}</small></div><div class="total" style="color:${isBalance ? '#4ade80' : '#ef4444'}; font-size:24px;">${isBalance ? 'BALANCE (SEIMBANG)' : 'TIDAK SEIMBANG'}</div></div>`;
+                
+                let operatingHTML = '', investingHTML = '', financingHTML = '';
+                let totalOperating = 0, totalInvesting = 0, totalFinancing = 0;
+                lines.forEach(line => {
+                    const account = accounts.find(a => a.id === line.account_id); if (!account) return;
+                    const amount = line.debit - line.credit; const isCashIn = amount > 0; const absAmount = Math.abs(amount);
+                    if (account.code.startsWith('4-')) { totalOperating += absAmount; operatingHTML += `<div class="cashflow-item ${isCashIn ? 'positive' : 'negative'}"><span>${account.name}</span><span>${isCashIn ? '+' : '-'} ${formatRupiah(absAmount)}</span></div>`; }
+                    else if (account.code.startsWith('5-') && !account.code.startsWith('5-1')) { totalOperating -= absAmount; operatingHTML += `<div class="cashflow-item ${isCashIn ? 'positive' : 'negative'}"><span>${account.name}</span><span>${isCashIn ? '+' : '-'} ${formatRupiah(absAmount)}</span></div>`; }
+                    else if (account.code.startsWith('1-4')) { if (line.debit > 0) { totalInvesting -= absAmount; investingHTML += `<div class="cashflow-item negative"><span>Pembelian ${account.name}</span><span>- ${formatRupiah(absAmount)}</span></div>`; } }
+                    else if (account.code.startsWith('2-')) { if (line.credit > 0) { totalFinancing += absAmount; financingHTML += `<div class="cashflow-item positive"><span>Penerimaan ${account.name}</span><span>+ ${formatRupiah(absAmount)}</span></div>`; } else { totalFinancing -= absAmount; financingHTML += `<div class="cashflow-item negative"><span>Pembayaran ${account.name}</span><span>- ${formatRupiah(absAmount)}</span></div>`; } }
+                });
+                if (operatingHTML) operatingHTML += `<div class="cashflow-item total ${totalOperating >= 0 ? 'positive' : 'negative'}"><span>Total Arus Kas Operasi</span><span>${totalOperating >= 0 ? '+' : ''} ${formatRupiah(totalOperating)}</span></div>`; else operatingHTML = '<p style="color:rgba(255,255,255,0.5);padding:10px 0;">Tidak ada transaksi operasi</p>';
+                if (investingHTML) investingHTML += `<div class="cashflow-item total ${totalInvesting >= 0 ? 'positive' : 'negative'}"><span>Total Arus Kas Investasi</span><span>${totalInvesting >= 0 ? '+' : ''} ${formatRupiah(totalInvesting)}</span></div>`; else investingHTML = '<p style="color:rgba(255,255,255,0.5);padding:10px 0;">Tidak ada transaksi investasi</p>';
+                if (financingHTML) financingHTML += `<div class="cashflow-item total ${totalFinancing >= 0 ? 'positive' : 'negative'}"><span>Total Arus Kas Pendanaan</span><span>${totalFinancing >= 0 ? '+' : ''} ${formatRupiah(totalFinancing)}</span></div>`; else financingHTML = '<p style="color:rgba(255,255,255,0.5);padding:10px 0;">Tidak ada transaksi pendanaan</p>';
+                const netCashFlow = totalOperating + totalInvesting + totalFinancing;
+                document.getElementById('cashflowOperating').innerHTML = operatingHTML; document.getElementById('cashflowInvesting').innerHTML = investingHTML; document.getElementById('cashflowFinancing').innerHTML = financingHTML;
+                document.getElementById('cashflowSummary').innerHTML = `<div class="report-summary ${netCashFlow >= 0 ? '' : 'loss'}" style="margin-top:30px;"><div><h4>KENAIKAN/(PENURUNAN) KAS BERSIH</h4><small>(Operasi + Investasi + Pendanaan)</small></div><div class="total" style="color:${netCashFlow >= 0 ? '#4ade80' : '#ef4444'};">${netCashFlow >= 0 ? '+' : ''} ${formatRupiah(netCashFlow)}</div></div>`;
+                document.getElementById('loadingReports').style.display = 'none'; document.getElementById('reportContent').style.display = 'block'; showReport('laba-rugi');
+            } catch (e) { showAlert('Gagal: ' + e.message, 'error'); }
         }
-        
-        async function loadReports() { 
-            document.getElementById('loadingReports').style.display='block'; 
-            document.getElementById('loadingReports').style.display='none'; 
-            document.getElementById('reportContent').style.display='block'; 
-            showReport('laba-rugi'); 
-            
-            const { data: inv } = await supabase.from('invoices').select('*');
-            const { data: exp } = await supabase.from('expenses').select('*');
-            const tp = inv ? inv.reduce((s, i) => s + (i.total_amount||0), 0) : 0;
-            const te = exp ? exp.reduce((s, e) => s + (e.amount||0), 0) : 0;
-            
-            document.getElementById('reportRevenue').innerHTML = `<div class="report-section-title">PENDAPATAN</div><div class="stat-card"><h3>Total Pendapatan</h3><div class="value">${formatRupiah(tp)}</div></div>`;
-            document.getElementById('reportExpense').innerHTML = `<div class="report-section-title" style="color:#ef4444; border-color:rgba(239,68,68,0.3)">BEBAN</div><div class="stat-card"><h3>Total Pengeluaran</h3><div class="value">${formatRupiah(te)}</div></div>`;
-            document.getElementById('reportSummary').innerHTML = `<div class="report-section-title" style="color:#4ade80; border-color:rgba(74,222,128,0.3)">LABA BERSIH</div><div class="stat-card"><h3>Hasil Akhir</h3><div class="value" style="color:${tp-te >= 0 ? '#4ade80' : '#ef4444'}">${formatRupiah(tp - te)}</div></div>`;
-        }
-        
-        window.showReport = (t) => { 
-            document.getElementById('reportLabaRugi').style.display = t==='laba-rugi'?'block':'none'; 
-            document.getElementById('reportNeraca').style.display = t==='neraca'?'block':'none'; 
-            document.getElementById('reportArusKas').style.display = t==='arus-kas'?'block':'none'; 
-        };
-        
-        window.exportInvoicePDF = (id) => { 
-            showAlert('Fitur export PDF Invoice sedang diproses...', 'info'); 
-        };
-        
-        window.exportLabaRugiExcel = () => { 
-            showAlert('Mengunduh Laporan Laba Rugi...', 'info'); 
-        };
-        
-        window.exportNeracaExcel = () => { 
-            showAlert('Mengunduh Laporan Neraca...', 'info'); 
-        };
+
+        async function loadWasteCollectionsForProduction() { const { data } = await supabase.from('waste_collections').select('*').order('collection_date', { ascending: false }); allWasteCollections = data || []; }
+        const originalOpenModalProduction = window.openModalProduction;
+        window.openModalProduction = async function() { await loadWasteCollectionsForProduction(); originalOpenModalProduction(); };
+
+        loadDashboard(); loadRitase();
     </script>
 </body>
 </html>
